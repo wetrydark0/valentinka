@@ -22,13 +22,13 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #0a050a; display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 100;
-            transition: opacity 1.5s ease;
+            transition: opacity 1s ease;
         }
 
         .glass-card {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px);
             padding: 35px; border-radius: 30px; border: 1px solid rgba(255, 20, 147, 0.3);
-            text-align: center; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            text-align: center; width: 280px;
         }
 
         input {
@@ -43,12 +43,13 @@
             cursor: pointer; font-weight: bold;
         }
 
-        /* ОНОВЛЕНИЙ КОНТЕЙНЕР ДЛЯ ВЕЛИКОГО ТЕКСТУ */
+        /* ВИПРАВЛЕНИЙ КОНТЕЙНЕР (додано opacity: 0) */
         #text-container {
             position: absolute; width: 90%; left: 5%; text-align: center;
             top: 120%; z-index: 10; 
-            transition: top 5s cubic-bezier(0.2, 0.8, 0.2, 1);
-            background: rgba(0, 0, 0, 0.5);
+            opacity: 0; /* Текст невидимий спочатку */
+            transition: top 5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 2s ease;
+            background: rgba(0, 0, 0, 0.6);
             padding: 40px 15px; border-radius: 30px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -57,14 +58,14 @@
 
         h1 { 
             font-family: 'Caveat', cursive; 
-            font-size: 55px; /* ДУЖЕ ВЕЛИКИЙ */
+            font-size: 55px; 
             margin: 0 0 15px 0; 
             color: #fff; 
             text-shadow: 0 0 20px #ff1493, 0 0 40px #ff1493; 
         }
 
         p { 
-            font-size: 28px; /* ДУЖЕ ВЕЛИКИЙ */
+            font-size: 28px; 
             line-height: 1.4; 
             color: #ffffff; 
             font-weight: 700; 
@@ -115,17 +116,13 @@
 
     function drawHeart(x, y, size, color, glow = 0) {
         ctx.save();
-        if(glow > 0) {
-            ctx.shadowBlur = glow;
-            ctx.shadowColor = color;
-        }
+        if(glow > 0) { ctx.shadowBlur = glow; ctx.shadowColor = color; }
         ctx.fillStyle = color;
         ctx.beginPath();
         ctx.moveTo(x, y);
         ctx.bezierCurveTo(x-size/2, y-size/2, x-size, y+size/3, x, y+size);
         ctx.bezierCurveTo(x+size, y+size/3, x+size/2, y-size/2, x, y);
-        ctx.fill();
-        ctx.restore();
+        ctx.fill(); ctx.restore();
     }
 
     function startApp() {
@@ -133,9 +130,13 @@
         const title = document.getElementById('main-title');
         const wish = document.getElementById('main-wish');
 
-        if (nameInput === "настя" || nameInput === "ангеліна") {
+        // ВИПРАВЛЕНА ЛОГІКА ІМЕН
+        if (nameInput === "настя") {
             title.innerText = "Для Насті! ✨";
             wish.innerHTML = "Ти неймовірна людина! <br> Нехай твоє життя буде сповнене <br> любові та магічних моментів. ❤️";
+        } else if (nameInput === "ангеліна") {
+            title.innerText = "Для Ангеліни! ✨";
+            wish.innerHTML = "Ти — справжній ангел! <br> Бажаю тобі море щастя <br> та найтепліших усмішок. ❤️";
         } else if (nameInput === "марта") {
             title.innerText = "Для Марти! 🌸";
             wish.innerHTML = "Ти — мій найдорожчий скарб. <br> Будь найщасливішою у світі, <br> бо ти на це заслуговуєш! ❤️";
@@ -180,7 +181,10 @@
                     });
                 }
                 setTimeout(() => { 
-                    document.getElementById('text-container').style.top = '15%'; 
+                    // ТЕПЕР ТЕКСТ З'ЯВЛЯЄТЬСЯ ТІЛЬКИ ТУТ
+                    const container = document.getElementById('text-container');
+                    container.style.opacity = '1'; 
+                    container.style.top = '15%'; 
                     state = 'final'; 
                 }, 600);
             }
