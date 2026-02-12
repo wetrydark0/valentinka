@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Infinity Love for Friends ✨</title>
+    <title>Magic Surprise ❤️</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
 
@@ -39,11 +39,13 @@
             padding: 12px 15px; font-size: 16px; border-radius: 25px; border: 2px solid #ff1493;
             background: rgba(0,0,0,0.8); color: white; outline: none; 
             width: 100%; box-sizing: border-box; transition: 0.3s;
-            appearance: none; /* Прибираємо стандартну стрілку для селекта */
+            appearance: none;
         }
 
-        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff1493' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-                 background-repeat: no-repeat; background-position: right 15px center; }
+        select { 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff1493' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 15px center; 
+        }
 
         button {
             padding: 15px 40px; font-size: 18px; border-radius: 35px; border: none;
@@ -62,16 +64,17 @@
         }
 
         #text-container {
-            position: absolute; width: 90%; left: 5%; text-align: center;
+            position: absolute; width: 92%; left: 4%; text-align: center;
             top: 120%; z-index: 10; opacity: 0;
             transition: top 4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 2s ease;
-            background: rgba(10, 5, 10, 0.75);
-            padding: 40px 20px; border-radius: 40px;
-            backdrop-filter: blur(15px); border: 1px solid rgba(255, 20, 147, 0.2);
+            background: rgba(10, 5, 10, 0.8);
+            padding: 30px 15px; border-radius: 40px;
+            backdrop-filter: blur(15px); border: 1px solid rgba(255, 20, 147, 0.3);
+            box-sizing: border-box;
         }
 
-        h1 { font-family: 'Caveat', cursive; font-size: 45px; margin: 0 0 15px 0; color: #fff; text-shadow: 0 0 20px #ff1493; }
-        p { font-size: 20px; line-height: 1.5; color: #fff; font-weight: 700; }
+        h1 { font-family: 'Caveat', cursive; font-size: 42px; margin: 0 0 15px 0; color: #fff; text-shadow: 0 0 20px #ff1493; }
+        p { font-size: 20px; line-height: 1.5; color: #fff; font-weight: 700; margin: 0; }
         #error-msg { color: #ff4444; margin-top: 10px; font-size: 13px; font-weight: bold; }
     </style>
 </head>
@@ -154,7 +157,8 @@
     }
 
     function startApp() {
-        const name = document.getElementById('userName').value.trim().toLowerCase();
+        const nameInput = document.getElementById('userName').value.trim();
+        const name = nameInput.toLowerCase();
         const role = document.getElementById('userRole').value;
         const title = document.getElementById('main-title');
         const wish = document.getElementById('main-wish');
@@ -165,17 +169,28 @@
             return;
         }
 
-        // Логіка перевірки
         if (role === "sister" && name === "марта") {
-            title.innerText = "Для моєї сестрички Марти! 🌸";
-            wish.innerHTML = "Ти — найближча мені людина, мій найкращий друг і надійна опора. Бажаю тобі нескінченного океану кохання, затишку в серці та щоб ти завжди відчувала мою підтримку. Люблю тебе безмежно! ❤️";
-        } else if (role === "friend_f" && (name === "настя" || name === "ангеліна")) {
-            title.innerText = `Для ${name === "настя" ? "Насті" : "Ангеліни"}! ✨`;
-            wish.innerHTML = "Ти — справжнє сонечко, яке зігріває всіх навколо. Бажаю тобі ніколи не втрачати свого вогнику, сяяти яскравіше за зірки та отримувати від життя все найкраще. Нехай кожна мрія стане реальністю! ❤️";
-        } else if (role === "discord" || role === "kent" || role === "friend_m") {
-            title.innerText = `Здарова, ${name}! 🤝`;
-            wish.innerHTML = "Бро, дякую що ти є! Бажаю тобі сталевих нервів, топового заліза, низького пінгy та щоб в житті завжди все йшло по плану. Тисну руку! 🚀";
-        } else {
+            title.innerText = "Для Марти! 🌸";
+            wish.innerHTML = "Моя дорога сестричко, ти — найближча мені людина, мій найкращий друг і надійна опора. Бажаю тобі нескінченного океану кохання, затишку в серці та щоб ти завжди відчувала мою підтримку. Люблю тебе безмежно! ❤️";
+        } 
+        else if (role === "friend_f" && (name === "настя" || name === "ангеліна")) {
+            const capName = name.charAt(0).toUpperCase() + name.slice(1);
+            title.innerText = `Для ${capName}! ✨`;
+            wish.innerHTML = "Ти — справжнє сонечко, яке зігріває всіх навколо. Бажаю тобі ніколи не втрачати свого вогнику, сяяти яскравіше за зірки та отримувати від життя все найкраще. Нехай кожна твоя мрія стане реальністю вже сьогодні! ❤️";
+        } 
+        else if (role === "friend_m") {
+            title.innerText = `Здарова! 🤝`;
+            wish.innerHTML = "Вітаю тебе. Бажаю, щоб у житті все йшло рівно і без зайвих напрягів. Нехай здоров’я не підводить, а поруч завжди будуть вірні друзі. Удачі тобі у всіх твоїх справах, тисну руку!";
+        } 
+        else if (role === "kent") {
+            title.innerText = `Здарова, кентяра! ✊`;
+            wish.innerHTML = "Братан, дуже дякую що ти в мене є. Вітаю з таким чудовим днем. Бажаю тобі успіхів у житті, щоб все йшло плавно як їде 99. Щоб бак був завжди заповнений. Удачі тобі! 🤝";
+        } 
+        else if (role === "discord") {
+            title.innerText = `ГГ ВП, бро! 🎮`;
+            wish.innerHTML = "О, здарова! Вітаю тебе. Бажаю, щоб інет ніколи не лагав і пінг був мінімальним. Нехай у житті все буде так само чітко, як вдала катка з пацанами. Почуємось у войсі, удачі тобі!";
+        } 
+        else {
             error.innerText = "Щось не сходиться... Перевір ім'я або роль! 🤔";
             return;
         }
@@ -190,7 +205,7 @@
     }
 
     function resetApp() {
-        location.reload(); // Найпростіший спосіб скинути все до меню
+        location.reload();
     }
 
     function update() {
