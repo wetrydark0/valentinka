@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Heart Protector Fix ❤️</title>
+    <title>Heart Protector Final ❤️</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; touch-action: none; color: white; }
@@ -156,7 +156,7 @@
         if(state === 'defend') {
             enemies.forEach((en, i) => {
                 let d = Math.hypot(e.clientX - en.x, e.clientY - en.y);
-                if(d < 50) { // Збільшена зона кліку для зручності
+                if(d < 50) {
                     for(let j=0; j<15; j++) particles.push({x: en.x, y: en.y, vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12, a: 1, sz: 3});
                     enemies.splice(i, 1);
                 }
@@ -167,6 +167,7 @@
             for(let j=0; j<10; j++) particles.push({x: e.clientX, y: e.clientY, vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15, a: 1, sz: 4});
             if(clicksNeeded <= 0) {
                 state = 'explode';
+                document.getElementById('hint-text').style.opacity = '0'; // БАГ ВИПРАВЛЕНО ТУТ
                 for(let i=0; i<300; i++) particles.push({x: width/2, y: height/2, vx: (Math.random()-0.5)*60, vy: (Math.random()-0.5)*60, a: 1, sz: Math.random()*25});
                 showFinal();
             }
