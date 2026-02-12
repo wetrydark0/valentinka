@@ -3,88 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Premium Cinematic Heart ❤️</title>
+    <title>Smooth Magic Heart ❤️</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
-
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; touch-action: none; color: white; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; touch-action: none; }
         canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; }
-        
-        #login-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, #1a0510 0%, #000 100%); 
-            display: flex; justify-content: center; align-items: center; z-index: 100;
-            transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(30px);
-            padding: 40px 30px; border-radius: 50px; border: 1px solid rgba(255, 20, 147, 0.4);
-            text-align: center; width: 320px; box-shadow: 0 0 60px rgba(255, 20, 147, 0.2);
-        }
-
-        h2 { font-family: 'Caveat', cursive; font-size: 40px; margin: 0 0 20px 0; text-shadow: 0 0 10px rgba(255,20,147,0.5); }
-
-        input, select, button {
-            padding: 15px; margin: 12px 0; border-radius: 30px; border: 1px solid #ff1493;
-            background: rgba(0,0,0,0.6); color: #fff; width: 100%; box-sizing: border-box; outline: none; font-size: 16px;
-        }
-
-        button { 
-            background: linear-gradient(45deg, #ff1493, #8a2be2); font-weight: bold; cursor: pointer; border: none;
-            box-shadow: 0 5px 20px rgba(255, 20, 147, 0.4); transition: 0.3s;
-        }
-        button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 20, 147, 0.6); }
-
-        #hint-text {
-            position: fixed; top: 15%; width: 100%; text-align: center;
-            font-family: 'Caveat', cursive; font-size: 42px; color: #ff1493;
-            z-index: 20; opacity: 0; transition: 1.5s; text-shadow: 0 0 20px #ff1493; pointer-events: none;
-        }
-
-        #text-container {
-            position: absolute; width: 90%; left: 5%; text-align: center;
-            top: 120%; z-index: 30; opacity: 0;
-            transition: top 3.5s cubic-bezier(0.1, 0.8, 0.2, 1), opacity 2s;
-            background: rgba(0, 0, 0, 0.9); padding: 40px 20px; border-radius: 50px;
-            border: 2px solid #ff1493; box-shadow: 0 0 80px rgba(255, 20, 147, 0.4);
-        }
-
-        #close-btn { 
-            position: fixed; top: 30px; right: 30px; z-index: 110; width: 50px; height: 50px;
-            background: rgba(255,20,147,0.2); border-radius: 50%; display: flex; 
-            justify-content: center; align-items: center; cursor: pointer; opacity: 0; 
-            pointer-events: none; transition: 1s; border: 1px solid #ff1493; color: white; font-size: 26px;
-        }
+        #login-screen { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 100; transition: opacity 0.8s; }
+        .glass-card { background: rgba(20, 20, 20, 0.95); padding: 30px; border-radius: 40px; border: 1px solid #ff1493; text-align: center; width: 300px; }
+        input, select, button { padding: 14px; margin: 10px 0; border-radius: 25px; border: 1px solid #ff1493; background: #000; color: #fff; width: 100%; box-sizing: border-box; outline: none; }
+        button { background: linear-gradient(45deg, #ff1493, #4b0082); font-weight: bold; cursor: pointer; border: none; }
+        #hint-text { position: fixed; top: 18%; width: 100%; text-align: center; font-family: 'Caveat', cursive; font-size: 38px; color: #ff1493; z-index: 20; opacity: 0; transition: 0.5s; pointer-events: none; }
+        #text-container { position: absolute; width: 88%; left: 6%; text-align: center; top: 120%; z-index: 30; opacity: 0; transition: top 2.5s cubic-bezier(0.1, 0.8, 0.2, 1), opacity 1s; background: rgba(0, 0, 0, 0.95); padding: 30px 15px; border-radius: 40px; border: 1px solid #ff1493; }
+        #close-btn { position: fixed; top: 20px; right: 20px; z-index: 110; width: 45px; height: 45px; background: rgba(255,20,147,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; opacity: 0; pointer-events: none; color: white; border: 1px solid #ff1493; }
     </style>
 </head>
 <body onclick="handleClick(event)">
 
     <div id="close-btn" onclick="location.reload()">✕</div>
-    <div id="hint-text">Воно твоє... Розбий його! 💔</div>
+    <div id="hint-text">Воно твоє... Бий! 💔</div>
 
     <div id="login-screen">
         <div class="glass-card">
-            <h2>Хто ти, красуне? ✨</h2>
+            <h2 style="font-family: 'Caveat', cursive; color: white; margin-bottom: 20px;">Хто ти, красуне? ✨</h2>
             <select id="userRole" onchange="toggleSurname()">
                 <option value="none" selected disabled>Обери статус...</option>
                 <option value="sister">Сестра</option>
                 <option value="friend_f">Подруга</option>
                 <option value="friend_m">Друг</option>
                 <option value="kent">Кент</option>
-                <option value="discord">Кент з діскорда</option>
             </select>
-            <input type="text" id="userName" placeholder="Твоє ім'я..." autocomplete="off">
+            <input type="text" id="userName" placeholder="Ім'я..." autocomplete="off">
             <div id="surname-group" style="display:none;"><input type="text" id="userSurname" placeholder="Прізвище..."></div>
-            <button id="startBtn" onclick="startApp()">ВІДКРИТИ СЕРЦЕ 🔥</button>
-            <div id="error-msg" style="color:#ff4444; font-size:12px; margin-top:15px;"></div>
+            <button onclick="startApp()">ВІДКРИТИ СЕРЦЕ 🔥</button>
+            <div id="error-msg" style="color:#ff4444; font-size:12px; margin-top:10px;"></div>
         </div>
     </div>
 
     <canvas id="canvas"></canvas>
     <div id="text-container">
-        <h1 id="main-title" style="font-family: 'Caveat', cursive; font-size: 45px; color: #ff1493; margin-bottom: 20px;"></h1>
-        <p id="main-wish" style="font-size: 20px; line-height: 1.7; font-weight: 500;"></p>
+        <h1 id="main-title" style="font-family: 'Caveat', cursive; font-size: 38px; color: #ff1493; margin-bottom: 15px;"></h1>
+        <p id="main-wish" style="font-size: 18px; line-height: 1.5; color: white;"></p>
     </div>
 
 <script>
@@ -93,7 +51,7 @@
     const bgMusic = new Audio('https://www.chosic.com/wp-content/uploads/2021/04/My-Love-Piano-Melody.mp3');
     bgMusic.loop = true;
 
-    let width, height, particles = [], magicDust = [], bgHearts = [], state = 'wait';
+    let width, height, particles = [], magicDust = [], state = 'wait';
     let heartClicks = 0, heartScale = 0, heartShake = 0, timer = 0;
 
     function init() {
@@ -106,158 +64,105 @@
         document.getElementById('surname-group').style.display = (role === 'sister' || role === 'kent') ? 'block' : 'none';
     }
 
-    function drawHeart(x, y, size, color, glow = 0, angle = 0, fill = true) {
+    function drawHeart(x, y, size, color, glow = 0) {
         ctx.save();
-        ctx.translate(x, y - (size * 0.45)); 
-        ctx.rotate(angle);
+        ctx.translate(x, y - (size * 0.45));
         if(glow > 0) { ctx.shadowBlur = glow; ctx.shadowColor = color; }
         ctx.fillStyle = color;
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.bezierCurveTo(-size/2, -size/2, -size, size/3, 0, size);
         ctx.bezierCurveTo(size, size/3, size/2, -size/2, 0, 0);
-        if(fill) ctx.fill(); else ctx.stroke();
+        ctx.fill();
         ctx.restore();
     }
 
     function startApp() {
         const role = document.getElementById('userRole').value;
         const name = document.getElementById('userName').value.trim().toLowerCase();
-        const surname = document.getElementById('userSurname').value.trim().toLowerCase();
-        const error = document.getElementById('error-msg');
+        if(!role || role === "none" || !name) return;
 
-        if(!role || role === "none" || !name) { error.innerText = "Будь ласка, заповни поля! ✨"; return; }
-        
-        const sisterNames = ["настя", "анастасія", "марта"];
-        const sisterSurnames = ["цапар", "малітчук"];
-        const kentNames = ["максим", "макс"];
-        let match = false;
-
-        if (role === 'sister' && sisterNames.includes(name) && sisterSurnames.includes(surname)) match = true;
-        else if (role === 'friend_f' || role === 'friend_m' || role === 'discord') match = true;
-        else if (role === 'kent' && kentNames.includes(name) && surname === "голоднюк") match = true;
-
-        if(!match) { error.innerText = "Доступ обмежено! ❌"; return; }
-
-        bgMusic.play();
+        bgMusic.play().catch(() => {});
         document.getElementById('login-screen').style.opacity = '0';
-        
         setTimeout(() => {
             document.getElementById('login-screen').style.display = 'none';
-            timer = 0;
-            state = 'phase1';
+            timer = 0; state = 'p1';
             magicDust = [];
-            for(let i=0; i<400; i++) {
-                magicDust.push({ x: width/2, y: height/2, a: Math.random()*Math.PI*2, r: Math.random()*width, v: Math.random()*5+2, sz: Math.random()*6+2, color: Math.random() > 0.5 ? '#ff1493' : '#8a2be2' });
+            for(let i=0; i<200; i++) {
+                magicDust.push({ x: width/2, y: height/2, a: Math.random()*Math.PI*2, r: 0, v: Math.random()*4+2, sz: Math.random()*3+1 });
             }
-            setupFinalText(role);
-        }, 1200);
+            setupText(role);
+        }, 800);
     }
 
-    function setupFinalText(role) {
+    function setupText(role) {
         const t = document.getElementById('main-title'), w = document.getElementById('main-wish');
-        if (role === 'sister') { 
-            t.innerText = "Моїй любій сестричці ❤️"; 
-            w.innerText = "Моя дорога сестричко, ти — найближча мені людина, мій найкращий друг і надійна опора. Бажаю тобі нескінченного океану кохання, затишку в серці та щоб ти завжди відчувала мою підтримку. Люблю тебе безмежно! ❤️"; 
-        }
-        else if (role === 'friend_f') { 
-            t.innerText = "Найкращій подрузі! ✨"; 
-            w.innerText = "Ти — справжнє сонечко, яке зігріває всіх навколо. Бажаю тобі ніколи не втрачати свого вогнику, сяяти яскравіше за зірки та отримувати від життя все найкраще. Нехай кожна твоя мрія стане реальністю вже сьогодні! ❤️"; 
-        }
-        else if (role === 'friend_m') { 
-            t.innerText = "Вітання, друже! 🤝"; 
-            w.innerText = "Здарова! Вітаю тебе. Бажаю, щоб у житті все йшло рівно і без зайвих напрягів. Нехай здоров’я не підводить, а поруч завжди будуть вірні друзі. Удачі тобі у всіх твоїх справах, тисну руку! 🤝"; 
-        }
-        else if (role === 'kent' || role === 'discord') { 
-            t.innerText = "Для кента! ✊"; 
-            w.innerText = "Братан, дуже дякую що ти в мене є. Вітаю з таким чудовим днем. Бажаю тобі успіхів у житті, щоб все йшло плавно як їде 99. Щоб бак був завжди заповнений. Удачі тобі! 🤝"; 
-        }
+        if (role === 'sister') { t.innerText = "Сестричці ❤️"; w.innerText = "Моя дорога сестричко, ти — найближча мені людина, мій найкращий друг і надійна опора. Бажаю тобі нескінченного океану кохання, затишку в серці та щоб ти завжди відчувала мою підтримку. Люблю тебе безмежно! ❤️"; }
+        else if (role === 'friend_f') { t.innerText = "Подрузі! ✨"; w.innerText = "Ти — справжнє сонечко, яке зігріває всіх навколо. Бажаю тобі ніколи не втрачати свого вогнику, сяяти яскравіше за зірки та отримувати від життя все найкраще. Нехай кожна твоя мрія стане реальністю вже сьогодні! ❤️"; }
+        else if (role === 'friend_m') { t.innerText = "Друже! 🤝"; w.innerText = "Здарова! Вітаю тебе. Бажаю, щоб у житті все йшло рівно і без зайвих напрягів. Нехай здоров’я не підводить, а поруч завжди будуть вірні друзі. Удачі тобі у всіх твоїх справах, тисну руку! 🤝"; }
+        else { t.innerText = "Кенту! ✊"; w.innerText = "Братан, дуже дякую що ти в мене є. Вітаю з таким чудовим днем. Бажаю тобі успіхів у житті, щоб все йшло плавно як їде 99. Щоб бак був завжди заповнений. Удачі тобі! 🤝"; }
     }
 
     function handleClick(e) {
-        if (state === 'wait') return;
-        for(let i=0; i<20; i++) {
-            particles.push({ x: e.clientX, y: e.clientY, vx: (Math.random()-0.5)*20, vy: (Math.random()-0.5)*20, alpha: 1, sz: Math.random()*15, color: '#ff1493' });
-        }
+        if(state === 'wait') return;
+        for(let i=0; i<15; i++) particles.push({ x: e.clientX, y: e.clientY, vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15, a: 1 });
         if(state === 'ready') {
-            heartClicks++; heartScale += 0.15; heartShake = 30;
+            heartClicks++; heartScale += 0.12; heartShake = 20;
             if(heartClicks >= 15) {
                 state = 'drama';
                 document.getElementById('hint-text').style.opacity = '0';
                 setTimeout(() => {
                     state = 'explode';
-                    for(let i=0; i<500; i++) particles.push({ x: width/2, y: height/2, vx: (Math.random()-0.5)*60, vy: (Math.random()-0.5)*60, alpha: 1, sz: Math.random()*40, color: '#ff1493' });
+                    for(let i=0; i<200; i++) particles.push({ x: width/2, y: height/2, vx: (Math.random()-0.5)*40, vy: (Math.random()-0.5)*40, a: 1 });
                     setTimeout(() => {
                         document.getElementById('text-container').style.opacity = '1';
-                        document.getElementById('text-container').style.top = '10%';
+                        document.getElementById('text-container').style.top = '15%';
                         document.getElementById('close-btn').style.opacity = '1';
                         document.getElementById('close-btn').style.pointerEvents = 'auto';
-                    }, 800);
-                }, 1000);
+                    }, 500);
+                }, 800);
             }
         }
     }
 
     function update() {
-        // Ефект шлейфу (Motion Blur)
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
         ctx.fillRect(0, 0, width, height);
         if(state !== 'wait' && state !== 'explode') timer++;
 
-        // ФАЗИ АНІМАЦІЇ - ТЕПЕР ЖИВІ ТА ЕНЕРГІЙНІ
-        if(state === 'phase1') { // Енергетичне ядро
-            let s = 20 + Math.sin(timer*0.15)*15;
-            drawHeart(width/2, height/2, s, '#ff1493', 40);
-            if(timer > 120) state = 'phase2';
+        // Спрощені фази для FPS
+        if(state === 'p1') { // Ядро
+            drawHeart(width/2, height/2, 20 + Math.sin(timer*0.1)*10, '#ff1493', 20);
+            if(timer > 100) state = 'p2';
         } 
-        else if(state === 'phase2') { // Супернова (спалах і розліт)
-            magicDust.forEach(p => { p.r += p.v; p.v *= 1.05; let x = width/2 + Math.cos(p.a)*p.r; let y = height/2 + Math.sin(p.a)*p.r; drawHeart(x, y, p.sz, p.color, 15); });
-            if(timer > 250) state = 'phase3';
+        else if(state === 'p2') { // Вибух частинок
+            magicDust.forEach(p => { p.r += p.v; let x = width/2 + Math.cos(p.a)*p.r; let y = height/2 + Math.sin(p.a)*p.r; ctx.fillStyle = '#ff1493'; ctx.beginPath(); ctx.arc(x, y, p.sz, 0, 7); ctx.fill(); });
+            if(timer > 250) state = 'p3';
         } 
-        else if(state === 'phase3') { // Енергетичний шторм (хаотичні хвости)
-            magicDust.forEach(p => { p.a += 0.1; p.r = Math.sin(timer*0.02)*width*0.4; let x = width/2 + Math.cos(p.a)*p.r; let y = height/2 + Math.sin(p.a)*p.r; drawHeart(x, y, p.sz, '#ff1493', 10); });
-            if(timer > 450) state = 'phase4';
+        else if(state === 'p3') { // Спіраль
+            magicDust.forEach((p, i) => { p.a += 0.05; p.r = Math.sin(timer*0.02 + i)*width*0.3; let x = width/2 + Math.cos(p.a)*p.r; let y = height/2 + Math.sin(p.a)*p.r; ctx.fillStyle = '#8a2be2'; ctx.fillRect(x, y, p.sz, p.sz); });
+            if(timer > 450) state = 'p4';
         } 
-        else if(state === 'phase4') { // Подвійна спіраль (DNA)
-            magicDust.forEach((p, i) => { let y = (i/magicDust.length)*height; let x = width/2 + Math.sin(timer*0.05 + i*0.1)*150; drawHeart(x, y, p.sz, '#8a2be2', 10); });
-            if(timer > 650) state = 'phase5';
-        } 
-        else if(state === 'phase5') { // Зіткнення (Дві хвилі)
-            magicDust.forEach((p, i) => { let x = (i%2===0) ? (timer-650)*15 : width-(timer-650)*15; drawHeart(x, height/2 + Math.sin(i)*200, p.sz, '#fff', 15); });
-            if(timer > 850) state = 'phase6';
-        } 
-        else if(state === 'phase6') { // Золотий дощ (падаючі серця)
-            magicDust.forEach(p => { p.y = (p.y || 0) + 10; if(p.y > height) p.y = 0; drawHeart(Math.random()*width, p.y, p.sz, '#ffd700', 10); });
-            if(timer > 1050) state = 'phase7';
-        } 
-        else if(state === 'phase7') { // Кристалізація (збірка з усього екрану)
-            magicDust.forEach(p => { p.x += (width/2 - p.x)*0.1; p.y += (height/2 - p.y)*0.1; drawHeart(p.x, p.y, p.sz, '#ff1493', 20); });
-            if(timer > 1250) { state = 'ready'; heartScale = 1.2; document.getElementById('hint-text').style.opacity = '1'; }
+        else if(state === 'p4') { // Збірка
+            let allIn = true;
+            magicDust.forEach(p => { 
+                let dx = width/2 - p.x; let dy = height/2 - p.y;
+                p.x = (p.x || 0) + dx*0.1; p.y = (p.y || 0) + dy*0.1;
+                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, 7); ctx.fill();
+            });
+            if(timer > 600) { state = 'ready'; heartScale = 1; document.getElementById('hint-text').style.opacity = '1'; }
         }
 
-        // ВЕЛИКЕ СЕРЦЕ (ЦЕНТРОВАНЕ І КРАСИВЕ)
         if(state === 'ready' || state === 'drama') {
             heartShake *= 0.9;
-            let c = state === 'drama' ? '#fff' : '#ff1493';
-            let pulse = 130 * heartScale + Math.sin(Date.now()*0.01)*15;
-            // Малюємо кілька шарів для ефекту об'єму
-            drawHeart(width/2 + (Math.random()-0.5)*heartShake, height/2 + (Math.random()-0.5)*heartShake, pulse, c, 60);
-            drawHeart(width/2, height/2, pulse*0.8, 'rgba(255,255,255,0.3)', 20); // Блік
+            drawHeart(width/2 + (Math.random()-0.5)*heartShake, height/2 + (Math.random()-0.5)*heartShake, 110 * heartScale + Math.sin(Date.now()*0.005)*10, '#ff1493', 40);
         }
 
-        // ФОНОВІ СЕРДЕЧКА
-        if(state === 'explode' || (document.getElementById('text-container').style.opacity === '1')) {
-            if(Math.random() > 0.92) bgHearts.push({x: Math.random()*width, y: height+40, s: Math.random()*2+1.5, sz: Math.random()*20+10});
-        }
-        bgHearts.forEach((h, i) => { h.y -= h.s; drawHeart(h.x, h.y, h.sz, 'rgba(255,20,147,0.3)', 10); if(h.y < -100) bgHearts.splice(i,1); });
-
-        // ЧАСТИНКИ ВИБУХУ
         particles.forEach((p, i) => { 
-            p.x += p.vx; p.y += p.vy; p.alpha -= 0.01; 
-            drawHeart(p.x, p.y, p.sz, `rgba(255,20,147,${p.alpha})`, 10); 
-            if(p.alpha <= 0) particles.splice(i, 1); 
+            p.x += p.vx; p.y += p.vy; p.a -= 0.02; 
+            ctx.fillStyle = `rgba(255, 20, 147, ${p.a})`;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, 7); ctx.fill();
+            if(p.a <= 0) particles.splice(i, 1); 
         });
 
         requestAnimationFrame(update);
