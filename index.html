@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Тільки для обраних ❤️</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #0a050a; font-family: 'Verdana', sans-serif; touch-action: none; color: white; }
+        canvas { display: block; }
+        
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0a050a; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 100;
+            transition: opacity 1s;
+        }
+        input {
+            padding: 15px; font-size: 18px; border-radius: 10px; border: 2px solid #ff1493;
+            background: #1a0a1a; color: white; text-align: center; outline: none; margin-bottom: 20px;
+            width: 250px;
+        }
+        button {
+            padding: 12px 30px; font-size: 18px; border-radius: 10px; border: none;
+            background: #ff1493; color: white; cursor: pointer; transition: 0.3s;
+        }
+        button:hover { background: #ff69b4; transform: scale(1.1); }
+        #error-msg { color: #ff4444; margin-top: 15px; font-size: 14px; height: 20px; }
+
+        #text-container {
+            position: absolute; width: 100%; text-align: center;
+            top: 110%; transition: top 5s ease-out;
+        }
+        h1 { font-size: 28px; margin-bottom: 20px; text-shadow: 0 0 15px #ff1493; }
+        p { font-size: 18px; line-height: 1.6; color: #ffb6c1; font-style: italic; padding: 0 25px; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h2 style="margin-bottom: 30px;">Введи своє ім'я ✨</h2>
+        <input type="text" id="userName" placeholder="Твоє ім'я тут..." autocomplete="off">
+        <button onclick="startApp()">Перевірити 💌</button>
+        <div id="error-msg"></div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+    <div id="text-container">
+        <h1 id="main-title"></h1>
+        <p id="main-wish"></p>
+    </div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const textContainer = document.getElementById('text-container');
+    const mainTitle = document.getElementById('main-title');
+    const mainWish = document.getElementById('main-wish');
+    const errorMsg = document.getElementById('error-msg');
+
+    let width, height, particles = [], bgHearts = [], stars = [];
+    let state = 'wait'; 
+    let frame = 0;
+    const colors = ['#ff1493', '#ff69b4', '#dc143c', '#ba55d3', '#ffffff'];
+
+    function init() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        for(let i=0; i<80; i++) {
+            stars.push({x: Math.random()*width, y: Math.random()*height, size: Math.random()*2, alpha: Math.random()});
+        }
+    }
+
+    function drawHeart(x, y, size, color) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.bezierCurveTo(x - size/2, y - size/2, x - size, y + size/3, x, y + size);
+        ctx.bezierCurveTo(x + size, y + size/3, x + size/2, y - size/2, x, y);
+        ctx.fill();
+    }
+
+    function startApp() {
+        const name = document.getElementById('userName').value.trim().toLowerCase();
+        
+        if (name === "настя" || name === "ангеліна") {
+            mainTitle.innerText = "Для моєї найкращої подруги! ✨";
+            mainWish.innerHTML = "Ти неймовірна людина! <br> Нехай кожен день буде особливим, <br> а серце завжди квітне від щастя. ❤️";
+        } else if (name === "марта") {
+            mainTitle.innerText = "Для моєї дорогої сестри! 🌸";
+            mainWish.innerHTML = "Ти — найцінніше, що в мене є. <br> Бажаю тобі здійснення всіх мрій. <br> Люблю тебе! ❤️";
+        } else {
+            // Якщо ім'я не входить у список
+            errorMsg.innerText = "Нажаль для тебе валентинки немає 💔";
+            // Трясіння інпуту для ефекту помилки
+            document.getElementById('userName').style.borderColor = '#ff4444';
+            return; // Зупиняємо функцію, анімація не почнеться
+        }
+
+        // Якщо ім'я правильне - ховаємо екран вводу і запускаємо анімацію
+        document.getElementById('login-screen').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('login-screen').style.display = 'none';
+            state = 'pulse';
+        }, 1000);
+    }
+
+    function update() {
+        ctx.fillStyle = '#0a050a';
+        ctx.fillRect(0, 0, width, height);
+
+        stars.forEach(s => {
+            ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() > 0.95 ? Math.random() : s.alpha})`;
+            ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
+        });
+
+        if (state === 'pulse') {
+            frame++;
+            let scale = 1 + Math.sin(frame * 0.15) * 0.1;
+            let shake = frame > 120 ? (Math.random()-0.5)*15 : 0;
+            drawHeart(width/2 + shake, height/2 + shake, 100 * scale, '#ff1493');
+            
+            if (frame > 170) {
+                state = 'explode';
+                for(let i=0; i<90; i++) {
+                    let angle = Math.random() * Math.PI * 2;
+                    let speed = Math.random() * 11 + 2;
+                    particles.push({x: width/2, y: height/2, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, size: Math.random()*15+10, color: colors[Math.floor(Math.random()*colors.length)]});
+                }
+                setTimeout(() => { textContainer.style.top = '30%'; state = 'final'; }, 500);
+            }
+        }
+
+        if (state === 'explode' || state === 'final') {
+            particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy; p.vy += 0.2;
+                drawHeart(p.x, p.y, p.size, p.color);
+                if(p.y > height) particles.splice(i, 1);
+            });
+        }
+
+        if (state === 'final') {
+            if(Math.random() > 0.95) bgHearts.push({x: Math.random()*width, y: height+20, speed: Math.random()*2+1, size: Math.random()*10+10});
+        }
+
+        bgHearts.forEach((h, i) => {
+            h.y -= h.speed;
+            drawHeart(h.x, h.y, h.size, '#ff69b4');
+            if(h.y < -20) bgHearts.splice(i, 1);
+        });
+
+        requestAnimationFrame(update);
+    }
+
+    window.addEventListener('resize', init);
+    init(); update();
+</script>
+</body>
+</html>
