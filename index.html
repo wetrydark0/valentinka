@@ -5,9 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Magic Surprise ❤️</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:ital,wght@1,300&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
 
-        body { margin: 0; overflow: hidden; background: radial-gradient(circle, #1a0a1a 0%, #050205 100%); font-family: 'Montserrat', sans-serif; touch-action: none; color: white; }
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            /* Красивий градієнт: від темно-фіолетового до майже чорного */
+            background: radial-gradient(circle at center, #2d0b2d 0%, #0a050a 100%);
+            font-family: 'Montserrat', sans-serif; 
+            touch-action: none; 
+            color: white; 
+        }
+
         canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; }
         
         #login-screen {
@@ -18,44 +27,47 @@
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
-            padding: 40px; border-radius: 20px; border: 1px solid rgba(255, 20, 147, 0.3);
-            text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px);
+            padding: 35px; border-radius: 30px; border: 1px solid rgba(255, 20, 147, 0.3);
+            text-align: center; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
         input {
-            padding: 15px; font-size: 18px; border-radius: 30px; border: 2px solid #ff1493;
-            background: rgba(0,0,0,0.5); color: white; text-align: center; outline: none; 
-            margin-bottom: 20px; width: 220px; transition: 0.3s;
+            padding: 12px; font-size: 16px; border-radius: 25px; border: 2px solid #ff1493;
+            background: rgba(0,0,0,0.6); color: white; text-align: center; outline: none; 
+            margin-bottom: 20px; width: 85%; transition: 0.3s;
         }
-        input:focus { box-shadow: 0 0 15px #ff1493; width: 250px; }
+        input:focus { border-color: #ba55d3; box-shadow: 0 0 10px #ba55d3; }
 
         button {
-            padding: 12px 40px; font-size: 18px; border-radius: 30px; border: none;
+            padding: 12px 35px; font-size: 16px; border-radius: 25px; border: none;
             background: linear-gradient(45deg, #ff1493, #ba55d3); color: white; 
-            cursor: pointer; font-weight: bold; transition: 0.4s; box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+            cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 20, 147, 0.3);
         }
-        button:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 25px rgba(255, 20, 147, 0.6); }
 
         #text-container {
-            position: absolute; width: 100%; text-align: center;
-            top: 120%; z-index: 10; transition: top 6s cubic-bezier(0.2, 0, 0.2, 1);
+            position: absolute; width: 85%; left: 7.5%; text-align: center;
+            top: 120%; z-index: 10; 
+            transition: top 5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            background: rgba(45, 11, 45, 0.4); /* Напівпрозора підкладка */
+            padding: 25px 10px; border-radius: 25px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        h1 { font-family: 'Caveat', cursive; font-size: 50px; margin-bottom: 10px; text-shadow: 0 0 20px #ff1493; }
-        p { font-size: 20px; line-height: 1.8; color: #ffb6c1; max-width: 80%; margin: 0 auto; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        h1 { font-family: 'Caveat', cursive; font-size: 45px; margin: 0 0 10px 0; color: #fff; text-shadow: 0 0 20px #ff1493; }
+        p { font-size: 20px; line-height: 1.6; color: #ffe4e1; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         
-        #error-msg { color: #ff4444; margin-top: 15px; font-size: 14px; min-height: 20px; font-weight: 300; }
+        #error-msg { color: #ff4444; margin-top: 15px; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="glass-card">
-            <h2 style="font-family: 'Caveat', cursive; font-size: 35px; margin-top: 0;">Відкрий своє серце ✨</h2>
+            <h2 style="font-family: 'Caveat', cursive; font-size: 32px; margin-bottom: 25px;">Хто ти, красуне? ✨</h2>
             <input type="text" id="userName" placeholder="Твоє ім'я..." autocomplete="off">
-            <br>
-            <button onclick="startApp()">Почати магію ✨</button>
+            <button onclick="startApp()">Побачити магію ✨</button>
             <div id="error-msg"></div>
         </div>
     </div>
@@ -69,36 +81,35 @@
 <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const audioUrl = 'https://www.chosic.com/wp-content/uploads/2021/04/My-Love-Piano-Melody.mp3'; // Мила піаніно-мелодія
+    const audioUrl = 'https://www.chosic.com/wp-content/uploads/2021/04/My-Love-Piano-Melody.mp3';
     const bgMusic = new Audio(audioUrl);
     bgMusic.loop = true;
-    bgMusic.volume = 0.4;
+    bgMusic.volume = 0.3;
 
-    let width, height, particles = [], bgHearts = [], stars = [], mouseTrails = [];
+    let width, height, particles = [], bgHearts = [], stars = [];
     let state = 'wait'; 
     let frame = 0;
-    let mouse = { x: -100, y: -100 };
 
     function init() {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
         stars = [];
-        for(let i=0; i<150; i++) {
-            stars.push({x: Math.random()*width, y: Math.random()*height, size: Math.random()*2, speed: Math.random()*0.5 + 0.1});
+        for(let i=0; i<120; i++) {
+            stars.push({x: Math.random()*width, y: Math.random()*height, size: Math.random()*1.5, alpha: Math.random()});
         }
     }
 
-    function drawHeart(x, y, size, color, blur = 0) {
+    function drawHeart(x, y, size, color, glow = 0) {
         ctx.save();
-        if (blur > 0) {
-            ctx.shadowBlur = blur;
+        if(glow > 0) {
+            ctx.shadowBlur = glow;
             ctx.shadowColor = color;
         }
         ctx.fillStyle = color;
         ctx.beginPath();
         ctx.moveTo(x, y);
-        ctx.bezierCurveTo(x - size/2, y - size/2, x - size, y + size/3, x, y + size);
-        ctx.bezierCurveTo(x + size, y + size/3, x + size/2, y - size/2, x, y);
+        ctx.bezierCurveTo(x-size/2, y-size/2, x-size, y+size/3, x, y+size);
+        ctx.bezierCurveTo(x+size, y+size/3, x+size/2, y-size/2, x, y);
         ctx.fill();
         ctx.restore();
     }
@@ -110,16 +121,16 @@
 
         if (nameInput === "настя" || nameInput === "ангеліна") {
             title.innerText = "Найкращій подрузі! ✨";
-            wish.innerHTML = "Ти — промінь світла в моєму житті. <br> Нехай твоя душа завжди співає від щастя, <br> а кожен день буде маленьким святом! ❤️";
+            wish.innerHTML = "Ти неймовірна людина! <br> Нехай твоє життя буде сповнене <br> любові та магічних моментів. ❤️";
         } else if (nameInput === "марта") {
             title.innerText = "Любій сестричці! 🌸";
-            wish.innerHTML = "Ти — моя підтримка і натхнення. <br> Бажаю тобі море ніжності, любові <br> та здійснення найпотаємніших мрій! ❤️";
+            wish.innerHTML = "Ти — мій найдорожчий скарб. <br> Будь найщасливішою у світі, <br> бо ти на це заслуговуєш! ❤️";
         } else {
             document.getElementById('error-msg').innerText = "Нажаль, для тебе валентинки немає 💔";
             return;
         }
 
-        bgMusic.play().catch(() => console.log("Music need interaction"));
+        bgMusic.play().catch(() => {});
         document.getElementById('login-screen').style.opacity = '0';
         setTimeout(() => {
             document.getElementById('login-screen').style.display = 'none';
@@ -127,68 +138,58 @@
         }, 1500);
     }
 
-    window.addEventListener('mousemove', e => {
-        mouse.x = e.clientX; mouse.y = e.clientY;
-        if(state !== 'wait') mouseTrails.push({x: mouse.x, y: mouse.y, size: Math.random()*5+2, life: 1});
-    });
-
-    window.addEventListener('touchstart', e => {
-        mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY;
-        mouseTrails.push({x: mouse.x, y: mouse.y, size: 10, life: 1});
-    });
-
     function update() {
-        ctx.clearRect(0, 0, width, height);
+        // Замість очищення чорним, робимо напівпрозорий фон для ефекту шлейфу
+        ctx.fillStyle = 'rgba(10, 5, 10, 0.2)';
+        ctx.fillRect(0, 0, width, height);
 
-        // Зірки з паралаксом
+        // Малюємо зірки
         stars.forEach(s => {
-            s.y += s.speed;
-            if(s.y > height) s.y = 0;
-            ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()*0.5 + 0.5})`;
+            ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() > 0.9 ? Math.random() : s.alpha})`;
             ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
-        });
-
-        // Слід за мишкою
-        mouseTrails.forEach((t, i) => {
-            t.life -= 0.02;
-            ctx.fillStyle = `rgba(255, 105, 180, ${t.life})`;
-            ctx.beginPath(); ctx.arc(t.x, t.y, t.size, 0, Math.PI*2); ctx.fill();
-            if(t.life <= 0) mouseTrails.splice(i, 1);
         });
 
         if (state === 'pulse') {
             frame++;
-            let scale = 1 + Math.sin(frame * 0.1) * 0.15;
-            let shake = frame > 140 ? (Math.random()-0.5)*20 : 0;
-            drawHeart(width/2 + shake, height/2 + shake, 120 * scale, '#ff1493', 20);
+            let scale = 1 + Math.sin(frame * 0.12) * 0.15;
+            let shake = frame > 150 ? (Math.random()-0.5)*15 : 0;
+            drawHeart(width/2 + shake, height/2 + shake, 100 * scale, '#ff1493', 25);
             
-            if (frame > 200) {
+            if (frame > 210) {
                 state = 'explode';
-                for(let i=0; i<120; i++) {
+                for(let i=0; i<80; i++) {
                     let angle = Math.random() * Math.PI * 2;
-                    let speed = Math.random() * 15 + 2;
-                    particles.push({x: width/2, y: height/2, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, size: Math.random()*20+10, color: ['#ff1493', '#ba55d3', '#ffffff', '#ff69b4'][Math.floor(Math.random()*4)]});
+                    let speed = Math.random() * 10 + 2;
+                    particles.push({
+                        x: width/2, y: height/2, 
+                        vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, 
+                        size: Math.random()*15+8, 
+                        color: ['#ff1493', '#ba55d3', '#ff69b4', '#ffffff'][Math.floor(Math.random()*4)]
+                    });
                 }
-                setTimeout(() => { document.getElementById('text-container').style.top = '25%'; state = 'final'; }, 500);
+                setTimeout(() => { 
+                    document.getElementById('text-container').style.top = '25%'; 
+                    state = 'final'; 
+                }, 600);
             }
         }
 
         if (state === 'explode' || state === 'final') {
             particles.forEach((p, i) => {
-                p.x += p.vx; p.y += p.vy; p.vy += 0.25;
-                drawHeart(p.x, p.y, p.size, p.color);
+                p.x += p.vx; p.y += p.vy; p.vy += 0.2;
+                drawHeart(p.x, p.y, p.size, p.color, 10);
                 if(p.y > height + 50) particles.splice(i, 1);
             });
         }
 
         if (state === 'final') {
-            if(Math.random() > 0.92) bgHearts.push({x: Math.random()*width, y: height+30, speed: Math.random()*2+1.5, size: Math.random()*15+10});
+            if(Math.random() > 0.94) bgHearts.push({x: Math.random()*width, y: height+20, speed: Math.random()*2+1, size: Math.random()*12+8});
         }
 
         bgHearts.forEach((h, i) => {
             h.y -= h.speed;
-            drawHeart(h.x, h.y, h.size, '#ff69b4', 5);
-            if(h.y < -50) bgHearts.splice(i, 1);
+            drawHeart(h.x, h.y, h.size, 'rgba(255, 105, 180, 0.6)');
+            if(h.y < -30) bgHearts.splice(i, 1);
         });
 
         requestAnimationFrame(update);
