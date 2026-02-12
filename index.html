@@ -23,7 +23,7 @@
             background: radial-gradient(circle at center, #1a051a 0%, #050205 100%);
             display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 100;
-            transition: all 1.5s cubic-bezier(0.65, 0, 0.35, 1);
+            transition: all 1.2s cubic-bezier(0.65, 0, 0.35, 1);
         }
 
         .glass-card {
@@ -37,13 +37,24 @@
             background: rgba(0,0,0,0.8); color: white; text-align: center; outline: none; 
             margin-bottom: 25px; width: 90%; transition: 0.3s;
         }
-        input:focus { box-shadow: 0 0 20px rgba(255, 20, 147, 0.5); }
 
         button {
             padding: 15px 40px; font-size: 18px; border-radius: 35px; border: none;
             background: linear-gradient(45deg, #ff1493, #ba55d3); color: white; 
-            cursor: pointer; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; font-weight: bold; text-transform: uppercase;
         }
+
+        /* Кнопка Хрестик */
+        #close-btn {
+            position: fixed; top: 20px; right: 20px; width: 45px; height: 45px;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%;
+            color: white; font-size: 24px; display: flex;
+            justify-content: center; align-items: center; cursor: pointer;
+            z-index: 110; opacity: 0; pointer-events: none;
+            transition: opacity 1s ease, transform 0.3s ease;
+        }
+        #close-btn:hover { transform: scale(1.1); background: rgba(255, 20, 147, 0.3); }
 
         #text-container {
             position: absolute; width: 90%; left: 5%; text-align: center;
@@ -51,18 +62,18 @@
             transition: top 4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 2s ease;
             background: rgba(10, 5, 10, 0.7);
             padding: 40px 20px; border-radius: 40px;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 20, 147, 0.2);
-            box-shadow: 0 0 50px rgba(255, 20, 147, 0.15);
+            backdrop-filter: blur(15px); border: 1px solid rgba(255, 20, 147, 0.2);
         }
 
         h1 { font-family: 'Caveat', cursive; font-size: 55px; margin: 0 0 20px 0; color: #fff; text-shadow: 0 0 30px #ff1493; }
-        p { font-size: 24px; line-height: 1.6; color: #fff; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,1); }
+        p { font-size: 22px; line-height: 1.6; color: #fff; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,1); }
         
-        #error-msg { color: #ff4444; margin-top: 15px; font-size: 14px; font-weight: bold; }
+        #error-msg { color: #ff4444; margin-top: 15px; font-size: 14px; }
     </style>
 </head>
 <body onclick="handleInteraction(event)">
+
+    <div id="close-btn" onclick="resetApp()">✕</div>
 
     <div id="login-screen">
         <div class="glass-card">
@@ -97,12 +108,7 @@
         height = canvas.height = window.innerHeight;
         stars = [];
         for(let i=0; i<150; i++) {
-            stars.push({
-                x: Math.random()*width, 
-                y: Math.random()*height, 
-                size: Math.random()*2, 
-                z: Math.random()*width // Для паралаксу
-            });
+            stars.push({x: Math.random()*width, y: Math.random()*height, size: Math.random()*2});
         }
     }
 
@@ -118,22 +124,16 @@
     }
 
     function handleInteraction(e) {
-        mouseX = e.clientX || e.touches[0].clientX;
-        mouseY = e.clientY || e.touches[0].clientY;
-        
-        if (state !== 'wait') {
-            createBurst(mouseX, mouseY);
-        }
+        mouseX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+        mouseY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+        if (state !== 'wait') createBurst(mouseX, mouseY);
     }
 
     function createBurst(x, y) {
-        for(let i=0; i<8; i++) {
+        for(let i=0; i<6; i++) {
             burstParticles.push({
-                x: x, y: y,
-                vx: (Math.random()-0.5)*10,
-                vy: (Math.random()-0.5)*10,
-                size: Math.random()*8+4,
-                alpha: 1,
+                x: x, y: y, vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
+                size: Math.random()*8+4, alpha: 1,
                 color: ['#ff1493', '#ba55d3', '#ffffff'][Math.floor(Math.random()*3)]
             });
         }
@@ -144,43 +144,60 @@
         const title = document.getElementById('main-title');
         const wish = document.getElementById('main-wish');
 
-        if (nameInput === "настя") {
-            title.innerText = "Для Насті! ✨";
-            wish.innerHTML = "Ти — справжнє сонечко, яке зігріває всіх навколо. Бажаю тобі ніколи не втрачати свого вогнику, сяяти яскравіше за зірки та отримувати від життя все найкраще! ❤️";
-        } else if (nameInput === "ангеліна") {
-            title.innerText = "Для Ангеліни! ✨";
-            wish.innerHTML = "Ти — справжнє сонечко, яке зігріває всіх навколо. Бажаю тобі ніколи не втрачати свого вогнику, сяяти яскравіше за зірки та отримувати від життя все найкраще! ❤️";
+        if (nameInput === "настя" || nameInput === "ангеліна") {
+            title.innerText = `Для ${nameInput === "настя" ? "Насті" : "Ангеліни"}! ✨`;
+            wish.innerHTML = "Ти — справжнє сонечко, яке зігріває всіх навколо. Бажаю тобі ніколи не втрачати свого вогнику, сяяти яскравіше за зірки та отримувати від життя все найкраще, на що ти заслуговуєш! ❤️";
         } else if (nameInput === "марта") {
             title.innerText = "Для Марти! 🌸";
-            wish.innerHTML = "Моя дорога сестричко, ти — найближча мені людина, мій найкращий друг і надійна опора. Бажаю тобі нескінченного океану кохання та затишку в серці. Люблю тебе! ❤️";
+            wish.innerHTML = "Моя дорога сестричко, ти — найближча мені людина, мій найкращий друг і надійна опора. Бажаю тобі нескінченного океану кохання та затишку в серці. Люблю тебе безмежно! ❤️";
         } else {
-            document.getElementById('error-msg').innerText = "Доступ заборонено. Тільки для обраних 💔";
+            document.getElementById('error-msg').innerText = "Доступ заборонено 💔";
             return;
         }
 
         bgMusic.play().catch(() => {});
-        document.getElementById('login-screen').style.transform = 'scale(1.5)';
         document.getElementById('login-screen').style.opacity = '0';
+        document.getElementById('login-screen').style.transform = 'scale(1.2)';
         setTimeout(() => {
             document.getElementById('login-screen').style.display = 'none';
             state = 'pulse';
-        }, 1500);
+        }, 1200);
+    }
+
+    // ФУНКЦІЯ ПОВЕРНЕННЯ ДО МЕНЮ
+    function resetApp() {
+        state = 'wait';
+        frame = 0;
+        particles = [];
+        bgHearts = [];
+        burstParticles = [];
+        
+        // Скидаємо UI
+        const login = document.getElementById('login-screen');
+        login.style.display = 'flex';
+        setTimeout(() => {
+            login.style.opacity = '1';
+            login.style.transform = 'scale(1)';
+        }, 50);
+
+        document.getElementById('text-container').style.opacity = '0';
+        document.getElementById('text-container').style.top = '120%';
+        document.getElementById('close-btn').style.opacity = '0';
+        document.getElementById('close-btn').style.pointerEvents = 'none';
+        
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
     }
 
     function update() {
-        // Темний фон з легким шлейфом
         ctx.fillStyle = 'rgba(5, 2, 5, 0.2)';
         ctx.fillRect(0, 0, width, height);
 
-        // Зірки з ефектом паралаксу
         stars.forEach(s => {
-            let sX = s.x + (mouseX - width/2) * (s.size/20);
-            let sY = s.y + (mouseY - height/2) * (s.size/20);
             ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()*0.5 + 0.5})`;
-            ctx.beginPath(); ctx.arc(sX, sY, s.size, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
         });
 
-        // Частинки від кліку
         burstParticles.forEach((p, i) => {
             p.x += p.vx; p.y += p.vy; p.alpha -= 0.02;
             drawHeart(p.x, p.y, p.size, `rgba(255, 20, 147, ${p.alpha})`);
@@ -190,25 +207,22 @@
         if (state === 'pulse') {
             frame++;
             let scale = 1 + Math.sin(frame * 0.1) * 0.2;
-            let shake = frame > 160 ? (Math.random()-0.5)*20 : 0;
-            drawHeart(width/2 + shake, height/2 + shake, 110 * scale, '#ff1493', 30);
+            let shake = frame > 160 ? (Math.random()-0.5)*15 : 0;
+            drawHeart(width/2 + shake, height/2 + shake, 100 * scale, '#ff1493', 30);
             
             if (frame > 220) {
                 state = 'explode';
-                for(let i=0; i<120; i++) {
+                for(let i=0; i<80; i++) {
                     let angle = Math.random() * Math.PI * 2;
-                    let speed = Math.random() * 12 + 4;
-                    particles.push({
-                        x: width/2, y: height/2, 
-                        vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, 
-                        size: Math.random()*20+10, 
-                        color: ['#ff1493', '#ba55d3', '#ffffff'][Math.floor(Math.random()*3)]
-                    });
+                    let speed = Math.random() * 10 + 4;
+                    particles.push({x: width/2, y: height/2, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, size: Math.random()*15+8, color: '#ff1493'});
                 }
                 setTimeout(() => { 
-                    const container = document.getElementById('text-container');
-                    container.style.opacity = '1'; 
-                    container.style.top = '10%'; 
+                    document.getElementById('text-container').style.opacity = '1'; 
+                    document.getElementById('text-container').style.top = '10%'; 
+                    // ПОКАЗУЄМО ХРЕСТИК
+                    document.getElementById('close-btn').style.opacity = '1';
+                    document.getElementById('close-btn').style.pointerEvents = 'auto';
                     state = 'final'; 
                 }, 800);
             }
@@ -223,15 +237,13 @@
         }
 
         if (state === 'final') {
-            if(Math.random() > 0.9) {
-                bgHearts.push({x: Math.random()*width, y: height+20, speed: Math.random()*2+2, size: Math.random()*15+10});
-            }
+            if(Math.random() > 0.94) bgHearts.push({x: Math.random()*width, y: height+20, speed: Math.random()*2+1, size: Math.random()*12+8});
         }
 
         bgHearts.forEach((h, i) => {
             h.y -= h.speed;
             drawHeart(h.x, h.y, h.size, 'rgba(255, 105, 180, 0.4)');
-            if(h.y < -50) bgHearts.splice(i, 1);
+            if(h.y < -30) bgHearts.splice(i, 1);
         });
 
         requestAnimationFrame(update);
