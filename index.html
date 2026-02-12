@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Broken Heart Surprise ❤️</title>
+    <title>Magic Heart Clicker ❤️</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
 
@@ -40,9 +40,9 @@
 
         #hint-text {
             position: fixed; top: 20%; width: 100%; text-align: center;
-            font-family: 'Caveat', cursive; font-size: 30px; color: #ff1493;
+            font-family: 'Caveat', cursive; font-size: 32px; color: #ff1493;
             z-index: 20; opacity: 0; transition: opacity 1s; pointer-events: none;
-            text-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
+            text-shadow: 0 0 15px rgba(255, 20, 147, 0.6);
         }
 
         #text-container {
@@ -52,7 +52,6 @@
             background: rgba(10, 5, 10, 0.85); padding: 30px 15px; border-radius: 40px;
             backdrop-filter: blur(15px); border: 1px solid rgba(255, 20, 147, 0.3);
         }
-
         #error-msg { color: #ff4444; margin-top: 10px; font-size: 13px; font-weight: bold; }
     </style>
 </head>
@@ -103,20 +102,65 @@
     const bgMusic = new Audio('https://www.chosic.com/wp-content/uploads/2021/04/My-Love-Piano-Melody.mp3');
     bgMusic.loop = true;
 
-    let width, height, stars = [], particles = [], state = 'wait';
-    let heartClicks = 0, heartScale = 1, heartShake = 0;
-    let assemblingParticles = [];
+    let width, height, stars = [], particles = [], bgHearts = [], state = 'wait';
+    let heartClicks = 0, heartScale = 1, heartShake = 0, assemblingParticles = [];
 
     function init() {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
         stars = [];
-        for(let i=0; i<100; i++) stars.push({x: Math.random()*width, y: Math.random()*height, size: Math.random()*2});
+        for(let i=0; i<80; i++) stars.push({x: Math.random()*width, y: Math.random()*height, size: Math.random()*2});
     }
 
     function toggleSurname() {
         const role = document.getElementById('userRole').value;
         document.getElementById('surname-group').style.display = (role === 'sister' || role === 'kent') ? 'block' : 'none';
+    }
+
+    function drawHeart(x, y, size, color, glow = 0) {
+        ctx.save();
+        if(glow > 0) { ctx.shadowBlur = glow; ctx.shadowColor = color; }
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.bezierCurveTo(x-size/2, y-size/2, x-size, y+size/3, x, y+size);
+        ctx.bezierCurveTo(x+size, y+size/3, x+size/2, y-size/2, x, y);
+        ctx.fill(); ctx.restore();
+    }
+
+    function handleClick(e) {
+        // Додаємо сплеск частинок при КУЖНОМУ кліку (навіть у пустоту)
+        for(let i=0; i<8; i++) {
+            particles.push({
+                x: e.clientX, y: e.clientY,
+                vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12,
+                size: Math.random()*12 + 4, alpha: 1, color: '#ff1493'
+            });
+        }
+
+        if (state === 'main_heart') {
+            heartClicks++;
+            heartScale += 0.1; // Швидше збільшення
+            heartShake = 20;
+
+            if (heartClicks >= 15) {
+                state = 'explode';
+                document.getElementById('hint-text').style.opacity = '0';
+                for(let i=0; i<120; i++) {
+                    particles.push({
+                        x: width/2, y: height/2,
+                        vx: (Math.random()-0.5)*30, vy: (Math.random()-0.5)*30,
+                        size: Math.random()*25+10, alpha: 1, color: '#ff69b4'
+                    });
+                }
+                setTimeout(() => {
+                    const container = document.getElementById('text-container');
+                    container.style.opacity = '1';
+                    container.style.top = '12%';
+                    state = 'final';
+                }, 600);
+            }
+        }
     }
 
     function startApp() {
@@ -157,76 +201,15 @@
             match = true;
         }
 
-        if (!match) {
-            error.innerText = "Дані не співпадають. 🤔";
-            return;
-        }
+        if (!match) { error.innerText = "Дані не співпадають. 🤔"; return; }
 
         bgMusic.play().catch(() => {});
         document.getElementById('login-screen').style.opacity = '0';
         setTimeout(() => {
             document.getElementById('login-screen').style.display = 'none';
-            createAssemblingParticles();
+            for(let i=0; i<150; i++) assemblingParticles.push({x: Math.random()*width, y: Math.random()*height, targetX: width/2, targetY: height/2, size: Math.random()*10+5, speed: Math.random()*0.02 + 0.01});
             state = 'assembling';
         }, 1000);
-    }
-
-    function createAssemblingParticles() {
-        for(let i=0; i<150; i++) {
-            assemblingParticles.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                targetX: width/2,
-                targetY: height/2,
-                size: Math.random() * 8 + 4,
-                speed: Math.random() * 0.02 + 0.01
-            });
-        }
-    }
-
-    function drawHeart(x, y, size, color, glow = 0) {
-        ctx.save();
-        if(glow > 0) { ctx.shadowBlur = glow; ctx.shadowColor = color; }
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.bezierCurveTo(x-size/2, y-size/2, x-size, y+size/3, x, y+size);
-        ctx.bezierCurveTo(x+size, y+size/3, x+size/2, y-size/2, x, y);
-        ctx.fill(); ctx.restore();
-    }
-
-    function handleClick(e) {
-        if (state === 'main_heart') {
-            heartClicks++;
-            heartScale += 0.08;
-            heartShake = 15;
-            
-            // Ефект частинок при кліку
-            for(let i=0; i<5; i++) {
-                particles.push({
-                    x: e.clientX, y: e.clientY,
-                    vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
-                    size: Math.random()*10, alpha: 1, color: '#ff1493'
-                });
-            }
-
-            if (heartClicks >= 15) {
-                state = 'explode';
-                document.getElementById('hint-text').style.opacity = '0';
-                for(let i=0; i<100; i++) {
-                    particles.push({
-                        x: width/2, y: height/2,
-                        vx: (Math.random()-0.5)*25, vy: (Math.random()-0.5)*25,
-                        size: Math.random()*20+10, alpha: 1, color: '#ff1493'
-                    });
-                }
-                setTimeout(() => {
-                    const container = document.getElementById('text-container');
-                    container.style.opacity = '1';
-                    container.style.top = '15%';
-                }, 500);
-            }
-        }
     }
 
     function update() {
@@ -234,6 +217,16 @@
         ctx.fillRect(0, 0, width, height);
         
         stars.forEach(s => { ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill(); });
+
+        // Спливаючі сердечка на фоні
+        if (state !== 'wait' && Math.random() > 0.95) {
+            bgHearts.push({x: Math.random()*width, y: height+20, speed: Math.random()*2+1, size: Math.random()*15+5});
+        }
+        bgHearts.forEach((h, i) => {
+            h.y -= h.speed;
+            drawHeart(h.x, h.y, h.size, 'rgba(255, 20, 147, 0.3)');
+            if (h.y < -50) bgHearts.splice(i, 1);
+        });
 
         if (state === 'assembling') {
             let finished = 0;
@@ -243,24 +236,17 @@
                 drawHeart(p.x, p.y, p.size, '#ff1493');
                 if (Math.abs(p.x - p.targetX) < 1) finished++;
             });
-            if (finished > 140) {
-                state = 'main_heart';
-                document.getElementById('hint-text').style.opacity = '1';
-            }
+            if (finished > 140) { state = 'main_heart'; document.getElementById('hint-text').style.opacity = '1'; }
         }
 
         if (state === 'main_heart') {
             heartShake *= 0.9;
-            let currentScale = heartScale + Math.sin(Date.now() * 0.005) * 0.1;
-            drawHeart(
-                width/2 + (Math.random()-0.5)*heartShake, 
-                height/2 + (Math.random()-0.5)*heartShake, 
-                100 * currentScale, '#ff1493', 40
-            );
+            let currentScale = heartScale + Math.sin(Date.now() * 0.005) * 0.15;
+            drawHeart(width/2 + (Math.random()-0.5)*heartShake, height/2 + (Math.random()-0.5)*heartShake, 100 * currentScale, '#ff1493', 40);
         }
 
         particles.forEach((p, i) => {
-            p.x += p.vx; p.y += p.vy; p.alpha -= 0.01;
+            p.x += p.vx; p.y += p.vy; p.alpha -= 0.015;
             drawHeart(p.x, p.y, p.size, `rgba(255, 20, 147, ${p.alpha})`);
             if (p.alpha <= 0) particles.splice(i, 1);
         });
