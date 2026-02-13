@@ -8,14 +8,35 @@
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; touch-action: none; color: white; }
         canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; }
+        
         #login-screen { position: fixed; inset: 0; background: radial-gradient(circle, #1a0510 0%, #000 100%); display: flex; justify-content: center; align-items: center; z-index: 100; transition: opacity 0.8s; }
         .glass-card { background: rgba(15, 15, 15, 0.95); padding: 30px; border-radius: 40px; border: 2px solid #ff1493; text-align: center; width: 320px; box-shadow: 0 0 40px rgba(255, 20, 147, 0.4); }
+        
         h2 { font-family: 'Caveat', cursive; font-size: 38px; margin-bottom: 20px; color: #ff69b4; text-shadow: 0 0 10px #ff1493; }
         .input-wrapper { position: relative; margin: 12px 0; }
         input, select, button { padding: 14px; border-radius: 25px; border: 1px solid #ff1493; background: #000; color: #fff; width: 100%; box-sizing: border-box; outline: none; font-size: 15px; }
         button { background: linear-gradient(45deg, #ff1493, #4b0082); font-weight: bold; cursor: pointer; border: none; margin-top: 10px; box-shadow: 0 0 15px rgba(255, 20, 147, 0.5); }
+        
         #hint-text { position: fixed; top: 20%; width: 100%; text-align: center; font-family: 'Caveat', cursive; font-size: 40px; color: #fff; z-index: 20; opacity: 0; transition: opacity 1s ease; text-shadow: 0 0 20px #ff1493; pointer-events: none; }
-        #text-container { position: absolute; width: 88%; left: 6%; text-align: center; top: 120%; z-index: 30; opacity: 0; transition: top 2.5s cubic-bezier(0.1, 0.8, 0.2, 1), opacity 1s; background: rgba(0, 0, 0, 0.95); padding: 30px; border-radius: 40px; border: 2px solid #ff1493; }
+        
+        /* ВИПРАВЛЕНИЙ БЛОК ПРИВІТАННЯ */
+        #text-container { 
+            position: absolute; 
+            width: 82%; /* Трохи вужча рамка */
+            left: 50%; /* Центрування по горизонталі */
+            transform: translateX(-50%); /* Точне вирівнювання по центру */
+            top: 120%; 
+            z-index: 30; 
+            opacity: 0; 
+            transition: top 2.5s cubic-bezier(0.1, 0.8, 0.2, 1), opacity 1s; 
+            background: rgba(0, 0, 0, 0.95); 
+            padding: 25px; /* Зменшений внутрішній відступ */
+            border-radius: 35px; 
+            border: 2px solid #ff1493; 
+            box-sizing: border-box;
+            text-align: center;
+        }
+        
         #close-btn { position: fixed; top: 25px; right: 25px; z-index: 110; width: 45px; height: 45px; background: rgba(255,20,147,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; opacity: 0; pointer-events: none; color: white; border: 1px solid #ff1493; }
     </style>
 </head>
@@ -50,8 +71,8 @@
 
     <canvas id="canvas"></canvas>
     <div id="text-container">
-        <h1 id="main-title" style="font-family: 'Caveat', cursive; font-size: 36px; color: #ff1493; margin-bottom: 15px;"></h1>
-        <p id="main-wish" style="font-size: 18px; line-height: 1.6;"></p>
+        <h1 id="main-title" style="font-family: 'Caveat', cursive; font-size: 32px; color: #ff1493; margin-bottom: 12px;"></h1>
+        <p id="main-wish" style="font-size: 17px; line-height: 1.5; margin: 0;"></p>
     </div>
 
 <script>
@@ -74,7 +95,6 @@
         document.getElementById('surname-group').style.display = (role === 'sister' || role === 'kent') ? 'block' : 'none';
     }
 
-    // Тріщина: тепер вона починається точно в 0,0
     function getCrackPath(size) {
         return [
             {x: 0, y: 0},
@@ -90,23 +110,16 @@
         const crack = getCrackPath(size);
         ctx.fillStyle = color;
         ctx.beginPath();
-        
         if (part === 'left') {
             ctx.moveTo(0, 0);
             ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0);
             ctx.bezierCurveTo(-size/2, -size/2, -size, size/3, 0, size);
-            // Замикаємо контур через точки тріщини
-            for (let i = crack.length - 1; i >= 0; i--) {
-                ctx.lineTo(crack[i].x, crack[i].y);
-            }
+            for (let i = crack.length - 1; i >= 0; i--) ctx.lineTo(crack[i].x, crack[i].y);
         } else {
             ctx.moveTo(0, 0);
             ctx.bezierCurveTo(size, size/3, size/2, -size/2, 0, 0);
             ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
-            // Замикаємо контур через точки тріщини
-            for (let i = crack.length - 1; i >= 0; i--) {
-                ctx.lineTo(crack[i].x, crack[i].y);
-            }
+            for (let i = crack.length - 1; i >= 0; i--) ctx.lineTo(crack[i].x, crack[i].y);
         }
         ctx.closePath();
         ctx.fill();
@@ -115,16 +128,10 @@
     function drawHeart(x, y, size, color, glow = 0, part = 'full') {
         ctx.save();
         ctx.translate(x, y - (size * 0.45));
-        
-        if(glow > 0) {
-            ctx.shadowBlur = glow;
-            ctx.shadowColor = color;
-        }
-
+        if(glow > 0) { ctx.shadowBlur = glow; ctx.shadowColor = color; }
         let grad = ctx.createRadialGradient(0, size/3, 0, 0, size/3, size);
         grad.addColorStop(0, color);
         grad.addColorStop(1, '#550011');
-        
         if (part === 'full') {
             ctx.fillStyle = grad;
             ctx.beginPath();
@@ -138,13 +145,10 @@
         ctx.restore();
     }
 
-    // Красива лінія тріщини з неоновим ефектом
     function drawFancyCrack(x, y, size, shake, gapValue) {
         ctx.save();
         ctx.translate(x, y - (size * 0.45));
         const crack = getCrackPath(size);
-        
-        // Малюємо дві лінії для ефекту розлому
         [-gapValue, gapValue].forEach(offset => {
             ctx.save();
             ctx.translate(offset, 0);
