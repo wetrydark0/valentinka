@@ -77,14 +77,15 @@
         document.getElementById('surname-group').style.display = (role === 'sister' || role === 'kent') ? 'block' : 'none';
     }
 
-    // ВИПРАВЛЕНО: Тріщина стала більш живою та виразною
+    // НОВА ЖИВА ТРІЩИНА: Складніша геометрія
     function getCrackPath(size) {
         return [
             {x: 0, y: 0},
-            {x: size * 0.1, y: size * 0.2},
-            {x: -size * 0.08, y: size * 0.4},
-            {x: size * 0.15, y: size * 0.6},
-            {x: -size * 0.05, y: size * 0.8},
+            {x: size * 0.12, y: size * 0.15},
+            {x: -size * 0.1, y: size * 0.3},
+            {x: size * 0.18, y: size * 0.45},
+            {x: -size * 0.15, y: size * 0.65},
+            {x: size * 0.05, y: size * 0.85},
             {x: 0, y: size}
         ];
     }
@@ -100,7 +101,7 @@
 
         let grad = ctx.createRadialGradient(0, size/3, 0, 0, size/3, size);
         grad.addColorStop(0, color);
-        grad.addColorStop(1, '#660022');
+        grad.addColorStop(1, '#440011');
         ctx.fillStyle = grad;
         
         const crack = getCrackPath(size);
@@ -110,15 +111,16 @@
             ctx.moveTo(0, 0);
             ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0);
             ctx.bezierCurveTo(-size/2, -size/2, -size, size/3, 0, size);
+            // Йдемо по тріщині знизу вгору
             for(let i = crack.length - 1; i >= 0; i--) { ctx.lineTo(crack[i].x, crack[i].y); }
             ctx.closePath();
             ctx.fill();
         } else if(part === 'right') {
-            // ВИПРАВЛЕНО: Права частина тепер замальована повністю і симетрично
             ctx.beginPath();
             ctx.moveTo(0, 0);
             ctx.bezierCurveTo(size, size/3, size/2, -size/2, 0, 0);
             ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
+            // Йдемо по тріщині знизу вгору
             for(let i = crack.length - 1; i >= 0; i--) { ctx.lineTo(crack[i].x, crack[i].y); }
             ctx.closePath();
             ctx.fill();
@@ -129,6 +131,35 @@
             ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
             ctx.fill();
         }
+        ctx.restore();
+    }
+
+    // НОВА ФУНКЦІЯ: Малювання красивої неонової тріщини
+    function drawGlowingCrack(x, y, size, shake) {
+        ctx.save();
+        ctx.translate(x + shake, y - (size * 0.45));
+        const crack = getCrackPath(size);
+        
+        // Зовнішнє світіння (розмите)
+        ctx.shadowBlur = 15 + Math.sin(timer * 0.1) * 5;
+        ctx.shadowColor = "#ff00ff";
+        ctx.strokeStyle = "rgba(255, 100, 255, 0.5)";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(crack[0].x, crack[0].y);
+        for(let p of crack) ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+
+        // Внутрішня яскрава лінія
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = "#fff";
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(crack[0].x, crack[0].y);
+        for(let p of crack) ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        
         ctx.restore();
     }
 
@@ -213,27 +244,12 @@
         if(state === 'pre_break') {
             let shake = Math.sin(timer * 0.7) * 4;
             drawHeart(width/2 + shake, height/2, 90, '#ff1493', 35);
-            
-            // ВИПРАВЛЕНО: Тріщина з красивим світінням
-            ctx.save(); 
-            ctx.translate(width/2 + shake, height/2 - 40);
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = "#ff69b4";
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
-            ctx.lineWidth = 3;
-            ctx.lineJoin = "round";
-            const crack = getCrackPath(90);
-            ctx.beginPath();
-            ctx.moveTo(crack[0].x, crack[0].y);
-            for(let p of crack) ctx.lineTo(p.x, p.y);
-            ctx.stroke(); 
-            ctx.restore();
-            
+            drawGlowingCrack(width/2, height/2, 90, shake);
             if(timer > 70) { state = 'break'; timer = 0; }
         }
 
         if(state === 'break') {
-            gap = Math.min(gap + 0.7, 56);
+            gap = Math.min(gap + 0.8, 56);
             drawHeart(width/2 - gap, height/2, 90, '#ff1493', 25, 'left');
             drawHeart(width/2 + gap, height/2, 90, '#ff1493', 25, 'right');
             if(timer > 150) {
