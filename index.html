@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Magic Heart Evolution ❤️</title>
+    <title>Heart Story ❤️</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; touch-action: none; color: white; }
@@ -17,7 +17,7 @@
         input, select, button { padding: 14px; border-radius: 25px; border: 1px solid #ff1493; background: #000; color: #fff; width: 100%; box-sizing: border-box; outline: none; font-size: 15px; }
         button { background: linear-gradient(45deg, #ff1493, #4b0082); font-weight: bold; cursor: pointer; border: none; margin-top: 10px; box-shadow: 0 0 15px rgba(255, 20, 147, 0.5); }
 
-        #hint-text { position: fixed; top: 20%; width: 100%; text-align: center; font-family: 'Caveat', cursive; font-size: 45px; color: #fff; z-index: 20; opacity: 0; transition: 0.5s; text-shadow: 0 0 20px #ff1493; pointer-events: none; }
+        #hint-text { position: fixed; top: 20%; width: 100%; text-align: center; font-family: 'Caveat', cursive; font-size: 40px; color: #fff; z-index: 20; opacity: 0; transition: 0.5s; text-shadow: 0 0 20px #ff1493; pointer-events: none; }
         #text-container { position: absolute; width: 88%; left: 6%; text-align: center; top: 120%; z-index: 30; opacity: 0; transition: top 2.5s cubic-bezier(0.1, 0.8, 0.2, 1), opacity 1s; background: rgba(0, 0, 0, 0.95); padding: 30px; border-radius: 40px; border: 2px solid #ff1493; }
         #close-btn { position: fixed; top: 25px; right: 25px; z-index: 110; width: 45px; height: 45px; background: rgba(255,20,147,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; opacity: 0; pointer-events: none; color: white; border: 1px solid #ff1493; }
     </style>
@@ -64,9 +64,9 @@
     bgMusic.loop = true;
 
     let width, height, state = 'wait', timer = 0;
-    let particles = [], enemies = [], magicDust = [], bgHearts = [];
+    let particles = [], enemies = [], magicDust = [], bgHearts = [], fixers = [];
     let heartScale = 1, heartShake = 0, clicksNeeded = 25, activeRole = "";
-    let enemiesSpawned = 0, heartAlpha = 0;
+    let enemiesSpawned = 0, gap = 0, fixedCount = 0;
     const TOTAL_ENEMIES = 10;
 
     function init() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
@@ -76,21 +76,36 @@
         document.getElementById('surname-group').style.display = (role === 'sister' || role === 'kent') ? 'block' : 'none';
     }
 
-    function drawHeart(x, y, size, color, glow = 0) {
+    function drawHeart(x, y, size, color, glow = 0, part = 'full') {
         ctx.save();
         ctx.translate(x, y - (size * 0.45));
         if(glow > 0) { ctx.shadowBlur = glow; ctx.shadowColor = color; }
         ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.bezierCurveTo(-size/2, -size/2, -size, size/3, 0, size);
-        ctx.bezierCurveTo(size, size/3, size/2, -size/2, 0, 0);
-        ctx.fill();
+        
+        if(part === 'left') {
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(-size/2, -size/2, -size, size/3, 0, size);
+            ctx.lineTo(0,0);
+            ctx.fill();
+        } else if(part === 'right') {
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(size, size/3, size/2, -size/2, 0, 0);
+            ctx.lineTo(0, size);
+            ctx.fill();
+        } else {
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(-size/2, -size/2, -size, size/3, 0, size);
+            ctx.bezierCurveTo(size, size/3, size/2, -size/2, 0, 0);
+            ctx.fill();
+        }
         ctx.restore();
     }
 
     function checkAccess(role, name, surname) {
-        name = name.toLowerCase(); surname = surname.toLowerCase();
+        name = name.toLowerCase(); surname = (surname || "").toLowerCase();
         if (role === 'sister') return ["настя", "анастасія", "марта"].includes(name) && ["цапар", "малітчук"].includes(surname);
         if (role === 'friend_f') return ["настя", "анастасія", "ангеліна", "евеліна", "люба", "любов"].includes(name);
         if (role === 'friend_m') return ["матвій", "олег", "саша", "олександ", "андрій", "олесь"].includes(name);
@@ -110,35 +125,149 @@
         setTimeout(() => {
             document.getElementById('login-screen').style.display = 'none';
             state = 'assemble'; timer = 0;
-            // Створення точок контуру великого серця
-            for(let i=0; i<250; i++) {
-                let angle = (i / 250) * Math.PI * 2;
-                let tx = 16 * Math.pow(Math.sin(angle), 3);
-                let ty = -(13 * Math.cos(angle) - 5 * Math.cos(2*angle) - 2 * Math.cos(3*angle) - Math.cos(4*angle));
-                magicDust.push({
-                    x: Math.random() * width, y: Math.random() * height,
-                    tx: width/2 + tx * 8, ty: height/2 + ty * 8,
-                    sz: Math.random() * 3 + 2,
-                    speed: 0.02 + Math.random() * 0.03
-                });
+            for(let i=0; i<100; i++) {
+                magicDust.push({ x: Math.random()*width, y: Math.random()*height, tx: width/2, ty: height/2, sz: Math.random()*4+2, v: 0.02 + Math.random()*0.02 });
             }
         }, 800);
     }
 
     function handleGlobalClick(e) {
+        if(state === 'fix') {
+            fixers.forEach((f, i) => {
+                if(Math.hypot(e.clientX - f.x, e.clientY - f.y) < 50) {
+                    fixers.splice(i, 1);
+                    fixedCount++;
+                    gap -= 15;
+                    for(let j=0; j<10; j++) particles.push({x: f.x, y: f.y, vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10, a: 1, sz: 3, type:'heart'});
+                }
+            });
+        }
         if(state === 'defend') {
             enemies.forEach((en, i) => {
                 if(Math.hypot(e.clientX - en.x, e.clientY - en.y) < 60) {
-                    for(let j=0; j<10; j++) particles.push({x: en.x, y: en.y, vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12, a: 1, sz: 3});
                     enemies.splice(i, 1);
+                    for(let j=0; j<10; j++) particles.push({x: en.x, y: en.y, vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12, a: 1, sz: 3, type:'dust'});
                 }
             });
         }
         if(state === 'clicker') {
             clicksNeeded--; heartScale += 0.04; heartShake = 20;
-            for(let j=0; j<10; j++) particles.push({x: e.clientX, y: e.clientY, vx: (Math.random()-0.5)*20, vy: (Math.random()-0.5)*20, a: 1, sz: 5});
-            if(clicksNeeded <= 0) { state = 'explode'; document.getElementById('hint-text').style.opacity = '0'; showFinal(); }
+            if(clicksNeeded <= 0) { 
+                state = 'vortex'; timer = 0;
+                document.getElementById('hint-text').style.opacity = '0';
+            }
         }
+    }
+
+    function update() {
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.fillRect(0,0,width,height);
+        timer++;
+
+        // 1. ЗБІРКА ТА РОЗЛОМ
+        if(state === 'assemble') {
+            magicDust.forEach(p => {
+                p.x += (p.tx - p.x) * p.v; p.y += (p.ty - p.y) * p.v;
+                drawHeart(p.x, p.y, p.sz, '#ff1493');
+            });
+            if(timer > 150) {
+                drawHeart(width/2, height/2, 80, '#ff1493', 20);
+                if(timer > 200) { state = 'break'; timer = 0; }
+            }
+        }
+
+        if(state === 'break') {
+            gap = Math.min(gap + 1.5, 60);
+            drawHeart(width/2 - gap, height/2, 80, '#ff1493', 20, 'left');
+            drawHeart(width/2 + gap, height/2, 80, '#ff1493', 20, 'right');
+            if(timer > 60) {
+                state = 'fix';
+                document.getElementById('hint-text').innerText = "Серце розбите... Полагодиш? 🩹";
+                document.getElementById('hint-text').style.opacity = '1';
+                for(let i=0; i<4; i++) fixers.push({ x: Math.random()*width, y: Math.random()*height, vx: 2, vy: 2 });
+            }
+        }
+
+        // 2. РЕМОНТ
+        if(state === 'fix') {
+            drawHeart(width/2 - gap, height/2, 80, '#ff1493', 20, 'left');
+            drawHeart(width/2 + gap, height/2, 80, '#ff1493', 20, 'right');
+            fixers.forEach(f => {
+                f.x += f.vx; f.y += f.vy;
+                if(f.x < 20 || f.x > width-20) f.vx *= -1;
+                if(f.y < 20 || f.y > height-20) f.vy *= -1;
+                drawHeart(f.x, f.y, 25, '#ff69b4', 15);
+            });
+            if(fixedCount === 4) {
+                state = 'pre_defend'; timer = 0;
+                document.getElementById('hint-text').innerText = "Воно ще слабке! Захисти його! 🛡️";
+            }
+        }
+
+        if(state === 'pre_defend' && timer > 120) { state = 'defend'; timer = 0; }
+
+        // 3. ЗАХИСТ
+        if(state === 'defend') {
+            drawHeart(width/2, height/2, 90, '#ff1493', 30);
+            if(timer % 50 === 0 && enemiesSpawned < TOTAL_ENEMIES) {
+                let ang = Math.random()*Math.PI*2;
+                enemies.push({x: width/2+Math.cos(ang)*width, y: height/2+Math.sin(ang)*width, speed: 2.3});
+                enemiesSpawned++;
+            }
+            enemies.forEach((en, i) => {
+                let a = Math.atan2(height/2-en.y, width/2-en.x);
+                en.x += Math.cos(a)*en.speed; en.y += Math.sin(a)*en.speed;
+                ctx.fillStyle = '#666'; ctx.beginPath(); ctx.arc(en.x, en.y, 10, 0, 7); ctx.fill();
+                if(Math.hypot(width/2-en.x, height/2-en.y) < 45) { alert("Серце не витримало... 💔"); location.reload(); }
+            });
+            if(enemiesSpawned === TOTAL_ENEMIES && enemies.length === 0) {
+                state = 'pulse'; timer = 0;
+                document.getElementById('hint-text').style.opacity = '0';
+            }
+        }
+
+        // 4. ПУЛЬСАЦІЯ ТА КЛІКЕР
+        if(state === 'pulse') {
+            let s = 100 + Math.sin(timer*0.1)*20;
+            drawHeart(width/2, height/2, s, '#ff1493', 40);
+            if(timer > 180) {
+                state = 'clicker';
+                document.getElementById('hint-text').innerText = "Тепер воно твоє! Відкрий його! 🔨";
+                document.getElementById('hint-text').style.opacity = '1';
+            }
+        }
+
+        if(state === 'clicker') {
+            heartShake *= 0.9;
+            drawHeart(width/2+(Math.random()-0.5)*heartShake, height/2+(Math.random()-0.5)*heartShake, 120*heartScale+Math.sin(timer*0.1)*5, '#ff1493', 50);
+        }
+
+        // 5. ВИХОР ТА ФІНАЛ
+        if(state === 'vortex') {
+            for(let i=0; i<5; i++) {
+                let a = timer * 0.2 + (i * Math.PI * 0.4);
+                let r = timer * 3;
+                particles.push({ x: width/2 + Math.cos(a)*r, y: height/2 + Math.sin(a)*r, vx: 0, vy: 0, a: 1, sz: 15, type: Math.random() > 0.5 ? 'heart' : 'flower' });
+            }
+            if(timer > 100) { state = 'final'; showFinal(); }
+        }
+
+        particles.forEach((p, i) => {
+            p.x += p.vx; p.y += p.vy; p.a -= 0.015;
+            if(p.type === 'flower') {
+                ctx.fillStyle = `rgba(255, 182, 193, ${p.a})`;
+                ctx.beginPath(); for(let j=0; j<5; j++) { let ang = j*1.25; ctx.lineTo(p.x+Math.cos(ang)*p.sz, p.y+Math.sin(ang)*p.sz); } ctx.fill();
+            } else {
+                drawHeart(p.x, p.y, p.sz, `rgba(255,20,147,${p.a})`);
+            }
+            if(p.a <= 0) particles.splice(i,1);
+        });
+
+        if(state === 'final') {
+            if(Math.random()>0.8) bgHearts.push({x:Math.random()*width, y:height+20, s:Math.random()*2+1});
+            bgHearts.forEach((h,i)=>{ h.y -= h.s; drawHeart(h.x, h.y, 15, 'rgba(255,20,147,0.2)'); if(h.y < -20) bgHearts.splice(i,1); });
+        }
+        requestAnimationFrame(update);
     }
 
     function showFinal() {
@@ -151,72 +280,12 @@
             discord: ["Кент з ДС! 🎮", "Братан, дуже дякую що ти в мене є. Вітаю з таким чудовим днем. Бажаю тобі успіхів у житті, щоб все йшло плавно як їде 99. Щоб бак був завжди заповнений. Удачі тобі! 🤝"]
         };
         const res = wishes[activeRole]; t.innerText = res[0]; w.innerText = res[1];
-        setTimeout(() => { document.getElementById('text-container').style.opacity = '1'; document.getElementById('text-container').style.top = '15%'; document.getElementById('close-btn').style.opacity = '1'; document.getElementById('close-btn').style.pointerEvents = 'auto'; }, 800);
+        document.getElementById('text-container').style.opacity = '1';
+        document.getElementById('text-container').style.top = '15%';
+        document.getElementById('close-btn').style.opacity = '1';
+        document.getElementById('close-btn').style.pointerEvents = 'auto';
     }
 
-    function update() {
-        ctx.fillStyle = 'rgba(0,0,0,0.2)';
-        ctx.fillRect(0,0,width,height);
-        timer++;
-
-        if(state === 'assemble') {
-            let reached = 0;
-            magicDust.forEach(p => {
-                p.x += (p.tx - p.x) * p.speed;
-                p.y += (p.ty - p.y) * p.speed;
-                drawHeart(p.x, p.y, p.sz, '#ff1493');
-                if(Math.hypot(p.x - p.tx, p.y - p.ty) < 5) reached++;
-            });
-            // Поступово проявляємо велике серце, поки маленькі злітаються
-            heartAlpha = reached / magicDust.length;
-            drawHeart(width/2, height/2, 115, `rgba(255, 20, 147, ${heartAlpha * 0.4})`, 20 * heartAlpha);
-
-            if(reached > magicDust.length * 0.95 && timer > 150) {
-                state = 'defend'; timer = 0;
-                document.getElementById('hint-text').innerText = "Захисти Серце! 🛡️";
-                document.getElementById('hint-text').style.opacity = '1';
-            }
-        }
-
-        if(state === 'defend') {
-            drawHeart(width/2, height/2, 115, '#ff1493', 30);
-            if(timer % 50 === 0 && enemiesSpawned < TOTAL_ENEMIES) {
-                let ang = Math.random()*Math.PI*2;
-                enemies.push({x: width/2+Math.cos(ang)*width, y: height/2+Math.sin(ang)*width, speed: 2.3});
-                enemiesSpawned++;
-            }
-            enemies.forEach((en, i) => {
-                let a = Math.atan2(height/2-en.y, width/2-en.x);
-                en.x += Math.cos(a)*en.speed; en.y += Math.sin(a)*en.speed;
-                ctx.fillStyle = '#666'; ctx.beginPath(); ctx.arc(en.x, en.y, 12, 0, 7); ctx.fill();
-                if(Math.hypot(width/2-en.x, height/2-en.y) < 55) { alert("Ти не зміг його захистити! 💔"); location.reload(); }
-            });
-            if(enemiesSpawned === TOTAL_ENEMIES && enemies.length === 0) { state = 'pulse'; timer = 0; document.getElementById('hint-text').style.opacity = '0'; }
-        }
-
-        if(state === 'pulse') {
-            let s = 115 + Math.sin(timer*0.1)*20;
-            drawHeart(width/2, height/2, s, '#ff1493', 40);
-            if(timer > 300) { state = 'clicker'; document.getElementById('hint-text').innerText = "Розбий його! 🔨"; document.getElementById('hint-text').style.opacity = '1'; }
-        }
-
-        if(state === 'clicker') {
-            heartShake *= 0.9;
-            drawHeart(width/2+(Math.random()-0.5)*heartShake, height/2+(Math.random()-0.5)*heartShake, 130*heartScale+Math.sin(timer*0.1)*5, '#ff1493', 40);
-        }
-
-        particles.forEach((p, i) => {
-            p.x += p.vx; p.y += p.vy; p.a -= 0.02;
-            drawHeart(p.x, p.y, p.sz, `rgba(255,20,147,${p.a})`);
-            if(p.a <= 0) particles.splice(i,1);
-        });
-
-        if(state === 'explode') {
-            if(Math.random()>0.8) bgHearts.push({x:Math.random()*width, y:height+20, s:Math.random()*2+1});
-            bgHearts.forEach((h,i)=>{ h.y -= h.s; drawHeart(h.x, h.y, 15, 'rgba(255,20,147,0.2)'); if(h.y < -20) bgHearts.splice(i,1); });
-        }
-        requestAnimationFrame(update);
-    }
     init(); update();
     window.addEventListener('resize', init);
 </script>
