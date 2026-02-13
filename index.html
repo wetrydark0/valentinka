@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Heart Quest Final Fixed ❤️</title>
+    <title>Broken Heart Story ❤️</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; touch-action: none; color: white; }
@@ -86,12 +86,16 @@
         ctx.beginPath();
         if(part === 'left') {
             ctx.moveTo(0, size);
+            // Ефект нерівного розлому (тріщини)
+            ctx.lineTo(-size*0.05, size*0.7); ctx.lineTo(size*0.05, size*0.4); ctx.lineTo(0, size*0.2);
             ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0);
             ctx.lineTo(0, size);
         } else if(part === 'right') {
             ctx.moveTo(0, 0);
             ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
-            ctx.lineTo(0, size);
+            // Симетрична тріщина
+            ctx.lineTo(-size*0.05, size*0.7); ctx.lineTo(size*0.05, size*0.4); ctx.lineTo(0, size*0.2);
+            ctx.lineTo(0, 0);
         } else {
             ctx.moveTo(0, size);
             ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0);
@@ -103,16 +107,11 @@
 
     function checkAccess(role, name, surname) {
         name = name.toLowerCase(); surname = (surname || "").toLowerCase();
-        const sisters = ["настя", "анастасія", "марта"];
-        const friendsF = ["настя", "анастасія", "ангеліна", "евеліна", "люба", "любов"];
-        const friendsM = ["матвій", "олег", "саша", "олександ", "андрій", "олесь"];
-        const ds = ["денис", "максим", "макс", "тімур", "діма", "самир", "данило", "ярік", "никита", "женя", "євген"];
-
-        if (role === 'sister') return sisters.includes(name) && ["цапар", "малітчук"].includes(surname);
-        if (role === 'friend_f') return friendsF.includes(name);
-        if (role === 'friend_m') return friendsM.includes(name);
+        if (role === 'sister') return ["настя", "анастасія", "марта"].includes(name) && ["цапар", "малітчук"].includes(surname);
+        if (role === 'friend_f') return ["настя", "анастасія", "ангеліна", "евеліна", "люба", "любов"].includes(name);
+        if (role === 'friend_m') return ["матвій", "олег", "саша", "олександ", "андрій", "олесь"].includes(name);
         if (role === 'kent') return (name === "максим" || name === "макс") && surname === "голоднюк";
-        if (role === 'discord') return ds.includes(name);
+        if (role === 'discord') return ["денис", "максим", "макс", "тімур", "діма", "самир", "данило", "ярік", "никита", "женя", "євген"].includes(name);
         return false;
     }
 
@@ -178,16 +177,34 @@
             
             if(allReached && timer > 400) {
                 heartAlpha = Math.min(heartAlpha + 0.02, 1);
-                drawHeart(width/2, height/2, 85, `rgba(255, 20, 147, ${heartAlpha})`, 25*heartAlpha);
-                if(heartAlpha >= 1 && timer > 550) { state = 'break'; timer = 0; }
+                // Пульсація цілого серця перед розломом (триває 4 сек)
+                let s = 85 + Math.sin(timer*0.05)*5;
+                drawHeart(width/2, height/2, s, `rgba(255, 20, 147, ${heartAlpha})`, 25*heartAlpha);
+                
+                if(timer > 750) { // Довга пауза споглядання
+                    state = 'pre_break'; timer = 0;
+                }
             }
         }
 
+        if(state === 'pre_break') {
+            // Ефект тріщини та здригання перед розломом
+            let shake = Math.sin(timer * 0.5) * 3;
+            drawHeart(width/2 + shake, height/2, 85, '#ff1493', 30);
+            // Малюємо лінію розлому поверх
+            ctx.strokeStyle = "white"; ctx.lineWidth = 2; ctx.beginPath();
+            ctx.moveTo(width/2, height/2 - 40); ctx.lineTo(width/2 - 5, height/2 - 10);
+            ctx.lineTo(width/2 + 5, height/2 + 20); ctx.lineTo(width/2, height/2 + 50);
+            ctx.stroke();
+            if(timer > 80) { state = 'break'; timer = 0; }
+        }
+
         if(state === 'break') {
-            gap = Math.min(gap + 1.2, 56);
+            // Плавне розходження половинок
+            gap = Math.min(gap + 0.8, 56);
             drawHeart(width/2 - gap, height/2, 85, '#ff1493', 25, 'left');
             drawHeart(width/2 + gap, height/2, 85, '#ff1493', 25, 'right');
-            if(timer > 100) {
+            if(timer > 120) {
                 state = 'fix';
                 const ht = document.getElementById('hint-text');
                 ht.innerText = "Серце розбите... Полагодиш? 🩹"; ht.style.opacity = '1';
