@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ultimate Heart Quest ❤️</title>
+    <title>Heart Quest Final ❤️</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; touch-action: none; color: white; }
@@ -15,7 +15,7 @@
             border: 2px solid #ff1493; text-align: center; width: 320px;
             box-shadow: 0 0 40px rgba(255, 20, 147, 0.4);
         }
-        h2 { font-family: 'Caveat', cursive; font-size: 34px; margin-bottom: 20px; color: #ff69b4; text-shadow: 0 0 10px #ff1493; }
+        h2 { font-family: 'Caveat', cursive; font-size: 38px; margin-bottom: 20px; color: #ff69b4; text-shadow: 0 0 10px #ff1493; }
         
         .input-wrapper { position: relative; margin: 12px 0; }
         .deco { position: absolute; right: 15px; top: 12px; font-size: 16px; pointer-events: none; }
@@ -28,11 +28,10 @@
             background: linear-gradient(45deg, #ff1493, #4b0082); font-weight: bold; cursor: pointer; border: none; 
             margin-top: 10px; box-shadow: 0 0 15px rgba(255, 20, 147, 0.5); transition: 0.3s;
         }
-        button:active { transform: scale(0.95); }
 
         #hint-text { 
             position: fixed; top: 20%; width: 100%; text-align: center; 
-            font-family: 'Caveat', cursive; font-size: 42px; color: #fff; 
+            font-family: 'Caveat', cursive; font-size: 45px; color: #fff; 
             z-index: 20; opacity: 0; transition: 0.5s; text-shadow: 0 0 20px #ff1493;
         }
 
@@ -56,10 +55,10 @@
 
     <div id="login-screen">
         <div class="glass-card">
-            <h2>Привіт! ✨🌸</h2>
+            <h2>Хто ти, красуне? ✨</h2>
             <div class="input-wrapper">
                 <select id="userRole" onchange="toggleSurname()">
-                    <option value="none" selected disabled>Хто ти? ✨</option>
+                    <option value="none" selected disabled>Обери роль... ✨</option>
                     <option value="sister">Сестра 🌸</option>
                     <option value="friend_f">Подруга 💖</option>
                     <option value="friend_m">Друг 🤝</option>
@@ -75,7 +74,7 @@
                 <input type="text" id="userSurname" placeholder="Прізвище...">
                 <span class="deco">🌸</span>
             </div>
-            <button id="startBtn" onclick="startApp()">ПОЧАТИ МАГІЮ ✨</button>
+            <button id="startBtn" onclick="startApp()">ВІДКРИТИ СЕРЦЕ 🔥</button>
             <div id="error-msg" style="color:#ff4444; font-size:12px; margin-top:10px; min-height: 15px;"></div>
         </div>
     </div>
@@ -83,7 +82,7 @@
     <canvas id="canvas"></canvas>
     <div id="text-container">
         <h1 id="main-title" style="font-family: 'Caveat', cursive; font-size: 36px; color: #ff1493; margin-bottom: 15px;"></h1>
-        <p id="main-wish" style="font-size: 17px; line-height: 1.6;"></p>
+        <p id="main-wish" style="font-size: 18px; line-height: 1.6;"></p>
     </div>
 
 <script>
@@ -125,24 +124,11 @@
     function checkAccess(role, name, surname) {
         name = name.toLowerCase();
         surname = surname.toLowerCase();
-        
-        if (role === 'sister') {
-            const names = ["настя", "анастасія", "марта"];
-            const sNames = ["цапар", "малітчук"];
-            return names.includes(name) && sNames.includes(surname);
-        }
-        if (role === 'friend_f') {
-            return ["настя", "анастасія", "ангеліна", "евеліна", "люба", "любов"].includes(name);
-        }
-        if (role === 'friend_m') {
-            return ["матвій", "олег", "саша", "олександ", "андрій", "олесь"].includes(name);
-        }
-        if (role === 'kent') {
-            return (name === "максим" || name === "макс") && surname === "голоднюк";
-        }
-        if (role === 'discord') {
-            return ["денис", "максим", "макс", "тімур", "діма", "самир", "данило", "ярік", "никита", "женя", "євген"].includes(name);
-        }
+        if (role === 'sister') return ["настя", "анастасія", "марта"].includes(name) && ["цапар", "малітчук"].includes(surname);
+        if (role === 'friend_f') return ["настя", "анастасія", "ангеліна", "евеліна", "люба", "любов"].includes(name);
+        if (role === 'friend_m') return ["матвій", "олег", "саша", "олександ", "андрій", "олесь"].includes(name);
+        if (role === 'kent') return (name === "максим" || name === "макс") && surname === "голоднюк";
+        if (role === 'discord') return ["денис", "максим", "макс", "тімур", "діма", "самир", "данило", "ярік", "никита", "женя", "євген"].includes(name);
         return false;
     }
 
@@ -150,37 +136,21 @@
         const role = document.getElementById('userRole').value;
         const name = document.getElementById('userName').value.trim();
         const surname = document.getElementById('userSurname').value.trim();
-        const err = document.getElementById('error-msg');
-
-        if(!role || !name) { err.innerText = "Заповни всі поля! ✍️"; return; }
-        if((role==='sister' || role==='kent') && !surname) { err.innerText = "Введи прізвище! ✍️"; return; }
-
         if(!checkAccess(role, name, surname)) {
-            err.innerText = "Тебе немає в списку! ❌";
+            document.getElementById('error-msg').innerText = "Доступ обмежено! ❌";
             return;
         }
-
         activeRole = role;
         document.getElementById('login-screen').style.opacity = '0';
         bgMusic.play().catch(() => {});
-        
         setTimeout(() => {
             document.getElementById('login-screen').style.display = 'none';
             state = 'assemble'; timer = 0;
-            // Створення плавної збірки
-            for(let i=0; i<200; i++) {
-                let angle = (i / 200) * Math.PI * 2;
-                // Формула контуру серця
+            for(let i=0; i<150; i++) {
+                let angle = (i / 150) * Math.PI * 2;
                 let tx = 16 * Math.pow(Math.sin(angle), 3);
                 let ty = -(13 * Math.cos(angle) - 5 * Math.cos(2*angle) - 2 * Math.cos(3*angle) - Math.cos(4*angle));
-                
-                magicDust.push({ 
-                    x: Math.random() * width, 
-                    y: Math.random() * height, 
-                    tx: width/2 + tx * 6, 
-                    ty: height/2 + ty * 6, 
-                    sz: Math.random()*4+3 
-                });
+                magicDust.push({ x: Math.random()*width, y: Math.random()*height, tx: width/2+tx*6, ty: height/2+ty*6, sz: Math.random()*3+2 });
             }
         }, 800);
     }
@@ -189,18 +159,18 @@
         if(state === 'defend') {
             enemies.forEach((en, i) => {
                 if(Math.hypot(e.clientX - en.x, e.clientY - en.y) < 60) {
-                    for(let j=0; j<12; j++) particles.push({x: en.x, y: en.y, vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15, a: 1, sz: 3});
+                    for(let j=0; j<10; j++) particles.push({x: en.x, y: en.y, vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12, a: 1, sz: 3});
                     enemies.splice(i, 1);
                 }
             });
         }
         if(state === 'clicker') {
-            clicksNeeded--; heartScale += 0.04; heartShake = 20;
-            for(let j=0; j<10; j++) particles.push({x: e.clientX, y: e.clientY, vx: (Math.random()-0.5)*20, vy: (Math.random()-0.5)*20, a: 1, sz: 5});
+            clicksNeeded--; heartScale += 0.04; heartShake = 15;
+            for(let j=0; j<8; j++) particles.push({x: e.clientX, y: e.clientY, vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15, a: 1, sz: 4});
             if(clicksNeeded <= 0) {
                 state = 'explode';
                 document.getElementById('hint-text').style.opacity = '0';
-                for(let i=0; i<400; i++) particles.push({x: width/2, y: height/2, vx: (Math.random()-0.5)*70, vy: (Math.random()-0.5)*70, a: 1, sz: Math.random()*30});
+                for(let i=0; i<300; i++) particles.push({x: width/2, y: height/2, vx: (Math.random()-0.5)*60, vy: (Math.random()-0.5)*60, a: 1, sz: Math.random()*20});
                 showFinal();
             }
         }
@@ -213,7 +183,7 @@
             friend_f: ["Для подруги ✨", "Ти — справжнє сонечко, яке зігріває всіх навколо. Бажаю тобі ніколи не втрачати свого вогнику, сяяти яскравіше за зірки та отримувати від життя все найкраще. Нехай кожна твоя мрія стане реальністю вже сьогодні! ❤️"],
             friend_m: ["Друже! 🤝", "Здарова! Вітаю тебе. Бажаю, щоб у житті все йшло рівно і без зайвих напрягів. Нехай здоров’я не підводить, а поруч завжди будуть вірні друзі. Удачі тобі у всіх твоїх справах, тисну руку! 🤝"],
             kent: ["Братан! ✊", "Братан, дуже дякую що ти в мене є. Вітаю з таким чудовим днем. Бажаю тобі успіхів у житті, щоб все йшло плавно як їде 99. Щоб бак був завжди заповнений. Удачі тобі! 🤝"],
-            discord: ["Кент з діскорда! 🎮", "Братан, дуже дякую що ти в мене є. Вітаю з таким чудовим днем. Бажаю тобі успіхів у житті, щоб все йшло плавно як їде 99. Щоб бак був завжди заповнений. Удачі тобі! 🤝"]
+            discord: ["Кент з ДС! 🎮", "Братан, дуже дякую що ти в мене є. Вітаю з таким чудовим днем. Бажаю тобі успіхів у житті, щоб все йшло плавно як їде 99. Щоб бак був завжди заповнений. Удачі тобі! 🤝"]
         };
         const res = wishes[activeRole];
         t.innerText = res[0]; w.innerText = res[1];
@@ -231,55 +201,46 @@
         timer++;
 
         if(state === 'assemble') {
-            let finished = 0;
+            // Малюємо контур основного серця відразу (з наростаючою прозорістю)
+            let alpha = Math.min(timer / 100, 1);
+            drawHeart(width/2, height/2, 90, `rgba(255, 20, 147, ${alpha * 0.5})`, 20);
+            
             magicDust.forEach(p => {
-                p.x += (p.tx - p.x) * 0.03; p.y += (p.ty - p.y) * 0.03;
-                drawHeart(p.x, p.y, p.sz, '#ff1493', 10);
-                if(Math.hypot(p.x-p.tx, p.y-p.ty) < 1) finished++;
+                p.x += (p.tx - p.x) * 0.05; p.y += (p.ty - p.y) * 0.05;
+                drawHeart(p.x, p.y, p.sz, '#ff1493');
             });
-            if(timer > 350 || finished > 190) { // Повільніше збирання (фаза 15 сек сумарно)
-                state = 'wait_defend'; timer = 0;
+            if(timer > 120) { 
+                state = 'defend'; timer = 0;
                 document.getElementById('hint-text').innerText = "Захисти Серце! 🛡️";
                 document.getElementById('hint-text').style.opacity = '1';
             }
         }
 
-        if(state === 'wait_defend' && timer > 100) { state = 'defend'; timer = 0; }
-
         if(state === 'defend') {
             drawHeart(width/2, height/2, 90, '#ff1493', 30);
-            if(timer % 60 === 0 && enemiesSpawned < TOTAL_ENEMIES) {
+            if(timer % 50 === 0 && enemiesSpawned < TOTAL_ENEMIES) {
                 let ang = Math.random()*Math.PI*2;
-                enemies.push({x: width/2+Math.cos(ang)*width, y: height/2+Math.sin(ang)*width, speed: 2});
+                enemies.push({x: width/2+Math.cos(ang)*width, y: height/2+Math.sin(ang)*width, speed: 2.2});
                 enemiesSpawned++;
             }
             enemies.forEach((en, i) => {
                 let a = Math.atan2(height/2-en.y, width/2-en.x);
                 en.x += Math.cos(a)*en.speed; en.y += Math.sin(a)*en.speed;
-                ctx.fillStyle = '#666'; ctx.beginPath(); ctx.arc(en.x, en.y, 12, 0, 7); ctx.fill();
-                if(Math.hypot(width/2-en.x, height/2-en.y) < 45) {
-                    alert("Ти не зміг його захистити! 💔"); location.reload();
-                }
+                ctx.fillStyle = '#777'; ctx.beginPath(); ctx.arc(en.x, en.y, 10, 0, 7); ctx.fill();
+                if(Math.hypot(width/2-en.x, height/2-en.y) < 45) { alert("Ти не зміг його захистити! 💔"); location.reload(); }
             });
-            if(enemiesSpawned === TOTAL_ENEMIES && enemies.length === 0) {
-                state = 'pulse'; timer = 0;
-                document.getElementById('hint-text').style.opacity = '0';
-            }
+            if(enemiesSpawned === TOTAL_ENEMIES && enemies.length === 0) { state = 'pulse'; timer = 0; document.getElementById('hint-text').style.opacity = '0'; }
         }
 
         if(state === 'pulse') {
-            let s = 110 + Math.sin(timer*0.1)*25;
+            let s = 100 + Math.sin(timer*0.1)*20;
             drawHeart(width/2, height/2, s, '#ff1493', 40);
-            if(timer > 300) { 
-                state = 'clicker'; 
-                document.getElementById('hint-text').innerText = "Розбий його! 🔨";
-                document.getElementById('hint-text').style.opacity = '1';
-            }
+            if(timer > 300) { state = 'clicker'; document.getElementById('hint-text').innerText = "Розбий його! 🔨"; document.getElementById('hint-text').style.opacity = '1'; }
         }
 
         if(state === 'clicker') {
             heartShake *= 0.9;
-            drawHeart(width/2 + (Math.random()-0.5)*heartShake, height/2 + (Math.random()-0.5)*heartShake, 120*heartScale + Math.sin(timer*0.1)*5, '#ff1493', 40);
+            drawHeart(width/2+(Math.random()-0.5)*heartShake, height/2+(Math.random()-0.5)*heartShake, 115*heartScale+Math.sin(timer*0.1)*5, '#ff1493', 40);
         }
 
         particles.forEach((p, i) => {
@@ -290,10 +251,7 @@
 
         if(state === 'explode') {
             if(Math.random()>0.9) bgHearts.push({x:Math.random()*width, y:height+20, s:Math.random()*2+1});
-            bgHearts.forEach((h,i)=>{
-                h.y -= h.s; drawHeart(h.x, h.y, 15, 'rgba(255,20,147,0.2)');
-                if(h.y < -20) bgHearts.splice(i,1);
-            });
+            bgHearts.forEach((h,i)=>{ h.y -= h.s; drawHeart(h.x, h.y, 12, 'rgba(255,20,147,0.2)'); if(h.y < -20) bgHearts.splice(i,1); });
         }
         requestAnimationFrame(update);
     }
