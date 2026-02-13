@@ -77,13 +77,14 @@
         document.getElementById('surname-group').style.display = (role === 'sister' || role === 'kent') ? 'block' : 'none';
     }
 
+    // ВИПРАВЛЕНО: Тріщина стала більш живою та виразною
     function getCrackPath(size) {
         return [
             {x: 0, y: 0},
-            {x: size * 0.08, y: size * 0.15},
-            {x: -size * 0.1, y: size * 0.35},
-            {x: size * 0.12, y: size * 0.55},
-            {x: -size * 0.05, y: size * 0.75},
+            {x: size * 0.1, y: size * 0.2},
+            {x: -size * 0.08, y: size * 0.4},
+            {x: size * 0.15, y: size * 0.6},
+            {x: -size * 0.05, y: size * 0.8},
             {x: 0, y: size}
         ];
     }
@@ -113,8 +114,10 @@
             ctx.closePath();
             ctx.fill();
         } else if(part === 'right') {
+            // ВИПРАВЛЕНО: Права частина тепер замальована повністю і симетрично
             ctx.beginPath();
             ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(size, size/3, size/2, -size/2, 0, 0);
             ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
             for(let i = crack.length - 1; i >= 0; i--) { ctx.lineTo(crack[i].x, crack[i].y); }
             ctx.closePath();
@@ -210,14 +213,22 @@
         if(state === 'pre_break') {
             let shake = Math.sin(timer * 0.7) * 4;
             drawHeart(width/2 + shake, height/2, 90, '#ff1493', 35);
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+            
+            // ВИПРАВЛЕНО: Тріщина з красивим світінням
+            ctx.save(); 
+            ctx.translate(width/2 + shake, height/2 - 40);
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#ff69b4";
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
             ctx.lineWidth = 3;
+            ctx.lineJoin = "round";
             const crack = getCrackPath(90);
-            ctx.save(); ctx.translate(width/2 + shake, height/2 - 40);
             ctx.beginPath();
             ctx.moveTo(crack[0].x, crack[0].y);
             for(let p of crack) ctx.lineTo(p.x, p.y);
-            ctx.stroke(); ctx.restore();
+            ctx.stroke(); 
+            ctx.restore();
+            
             if(timer > 70) { state = 'break'; timer = 0; }
         }
 
