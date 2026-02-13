@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Realistic Broken Heart Fixed ❤️</title>
+    <title>Perfect Broken Heart ❤️</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; touch-action: none; color: white; }
         canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; }
-        
         #login-screen { position: fixed; inset: 0; background: radial-gradient(circle, #1a0510 0%, #000 100%); display: flex; justify-content: center; align-items: center; z-index: 100; transition: opacity 0.8s; }
         .glass-card { background: rgba(15, 15, 15, 0.95); padding: 30px; border-radius: 40px; border: 2px solid #ff1493; text-align: center; width: 320px; box-shadow: 0 0 40px rgba(255, 20, 147, 0.4); }
         h2 { font-family: 'Caveat', cursive; font-size: 38px; margin-bottom: 20px; color: #ff69b4; text-shadow: 0 0 10px #ff1493; }
-        
         .input-wrapper { position: relative; margin: 12px 0; }
         input, select, button { padding: 14px; border-radius: 25px; border: 1px solid #ff1493; background: #000; color: #fff; width: 100%; box-sizing: border-box; outline: none; font-size: 15px; }
         button { background: linear-gradient(45deg, #ff1493, #4b0082); font-weight: bold; cursor: pointer; border: none; margin-top: 10px; box-shadow: 0 0 15px rgba(255, 20, 147, 0.5); }
-
         #hint-text { position: fixed; top: 20%; width: 100%; text-align: center; font-family: 'Caveat', cursive; font-size: 40px; color: #fff; z-index: 20; opacity: 0; transition: opacity 1s ease; text-shadow: 0 0 20px #ff1493; pointer-events: none; }
         #text-container { position: absolute; width: 88%; left: 6%; text-align: center; top: 120%; z-index: 30; opacity: 0; transition: top 2.5s cubic-bezier(0.1, 0.8, 0.2, 1), opacity 1s; background: rgba(0, 0, 0, 0.95); padding: 30px; border-radius: 40px; border: 2px solid #ff1493; }
         #close-btn { position: fixed; top: 25px; right: 25px; z-index: 110; width: 45px; height: 45px; background: rgba(255,20,147,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; opacity: 0; pointer-events: none; color: white; border: 1px solid #ff1493; }
@@ -77,17 +74,42 @@
         document.getElementById('surname-group').style.display = (role === 'sister' || role === 'kent') ? 'block' : 'none';
     }
 
-    // НОВА ЖИВА ТРІЩИНА: Складніша геометрія
+    // Тріщина: тепер вона починається точно в 0,0
     function getCrackPath(size) {
         return [
             {x: 0, y: 0},
-            {x: size * 0.12, y: size * 0.15},
-            {x: -size * 0.1, y: size * 0.3},
-            {x: size * 0.18, y: size * 0.45},
-            {x: -size * 0.15, y: size * 0.65},
-            {x: size * 0.05, y: size * 0.85},
+            {x: size * 0.1, y: size * 0.2},
+            {x: -size * 0.15, y: size * 0.4},
+            {x: size * 0.2, y: size * 0.6},
+            {x: -size * 0.1, y: size * 0.8},
             {x: 0, y: size}
         ];
+    }
+
+    function drawHeartPart(size, color, part) {
+        const crack = getCrackPath(size);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        
+        if (part === 'left') {
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0);
+            ctx.bezierCurveTo(-size/2, -size/2, -size, size/3, 0, size);
+            // Замикаємо контур через точки тріщини
+            for (let i = crack.length - 1; i >= 0; i--) {
+                ctx.lineTo(crack[i].x, crack[i].y);
+            }
+        } else {
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(size, size/3, size/2, -size/2, 0, 0);
+            ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
+            // Замикаємо контур через точки тріщини
+            for (let i = crack.length - 1; i >= 0; i--) {
+                ctx.lineTo(crack[i].x, crack[i].y);
+            }
+        }
+        ctx.closePath();
+        ctx.fill();
     }
 
     function drawHeart(x, y, size, color, glow = 0, part = 'full') {
@@ -101,65 +123,41 @@
 
         let grad = ctx.createRadialGradient(0, size/3, 0, 0, size/3, size);
         grad.addColorStop(0, color);
-        grad.addColorStop(1, '#440011');
-        ctx.fillStyle = grad;
+        grad.addColorStop(1, '#550011');
         
-        const crack = getCrackPath(size);
-
-        if(part === 'left') {
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0);
-            ctx.bezierCurveTo(-size/2, -size/2, -size, size/3, 0, size);
-            // Йдемо по тріщині знизу вгору
-            for(let i = crack.length - 1; i >= 0; i--) { ctx.lineTo(crack[i].x, crack[i].y); }
-            ctx.closePath();
-            ctx.fill();
-        } else if(part === 'right') {
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.bezierCurveTo(size, size/3, size/2, -size/2, 0, 0);
-            ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
-            // Йдемо по тріщині знизу вгору
-            for(let i = crack.length - 1; i >= 0; i--) { ctx.lineTo(crack[i].x, crack[i].y); }
-            ctx.closePath();
-            ctx.fill();
-        } else {
+        if (part === 'full') {
+            ctx.fillStyle = grad;
             ctx.beginPath();
             ctx.moveTo(0, size);
             ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0);
             ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
             ctx.fill();
+        } else {
+            drawHeartPart(size, grad, part);
         }
         ctx.restore();
     }
 
-    // НОВА ФУНКЦІЯ: Малювання красивої неонової тріщини
-    function drawGlowingCrack(x, y, size, shake) {
+    // Красива лінія тріщини з неоновим ефектом
+    function drawFancyCrack(x, y, size, shake, gapValue) {
         ctx.save();
-        ctx.translate(x + shake, y - (size * 0.45));
+        ctx.translate(x, y - (size * 0.45));
         const crack = getCrackPath(size);
         
-        // Зовнішнє світіння (розмите)
-        ctx.shadowBlur = 15 + Math.sin(timer * 0.1) * 5;
-        ctx.shadowColor = "#ff00ff";
-        ctx.strokeStyle = "rgba(255, 100, 255, 0.5)";
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(crack[0].x, crack[0].y);
-        for(let p of crack) ctx.lineTo(p.x, p.y);
-        ctx.stroke();
-
-        // Внутрішня яскрава лінія
-        ctx.shadowBlur = 5;
-        ctx.shadowColor = "#fff";
-        ctx.strokeStyle = "#fff";
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(crack[0].x, crack[0].y);
-        for(let p of crack) ctx.lineTo(p.x, p.y);
-        ctx.stroke();
-        
+        // Малюємо дві лінії для ефекту розлому
+        [-gapValue, gapValue].forEach(offset => {
+            ctx.save();
+            ctx.translate(offset, 0);
+            ctx.beginPath();
+            ctx.strokeStyle = "rgba(255, 100, 200, 0.8)";
+            ctx.lineWidth = 2;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "#ff1493";
+            ctx.moveTo(crack[0].x, crack[0].y);
+            for(let p of crack) ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+            ctx.restore();
+        });
         ctx.restore();
     }
 
@@ -232,11 +230,9 @@
                 }
                 if(!p.reached) allReached = false;
             });
-            
             if(allReached && timer > 400) {
                 heartAlpha = Math.min(heartAlpha + 0.02, 1);
-                let s = 90 + Math.sin(timer*0.04)*5;
-                drawHeart(width/2, height/2, s, `rgba(255, 20, 147, ${heartAlpha})`, 30*heartAlpha);
+                drawHeart(width/2, height/2, 90 + Math.sin(timer*0.04)*5, `rgba(255, 20, 147, ${heartAlpha})`, 30*heartAlpha);
                 if(timer > 800) { state = 'pre_break'; timer = 0; }
             }
         }
@@ -244,7 +240,7 @@
         if(state === 'pre_break') {
             let shake = Math.sin(timer * 0.7) * 4;
             drawHeart(width/2 + shake, height/2, 90, '#ff1493', 35);
-            drawGlowingCrack(width/2, height/2, 90, shake);
+            drawFancyCrack(width/2 + shake, height/2, 90, 0, 0);
             if(timer > 70) { state = 'break'; timer = 0; }
         }
 
@@ -252,10 +248,11 @@
             gap = Math.min(gap + 0.8, 56);
             drawHeart(width/2 - gap, height/2, 90, '#ff1493', 25, 'left');
             drawHeart(width/2 + gap, height/2, 90, '#ff1493', 25, 'right');
+            drawFancyCrack(width/2, height/2, 90, 0, gap);
             if(timer > 150) {
                 state = 'fix';
-                const ht = document.getElementById('hint-text');
-                ht.innerText = "Серце розбите... Полагодиш? 🩹"; ht.style.opacity = '1';
+                document.getElementById('hint-text').innerText = "Серце розбите... Полагодиш? 🩹";
+                document.getElementById('hint-text').style.opacity = '1';
                 for(let i=0; i<TOTAL_FIXERS; i++) fixers.push({ x: Math.random()*width, y: Math.random()*height, vx: (Math.random()-0.5)*7, vy: (Math.random()-0.5)*7 });
             }
         }
@@ -263,6 +260,7 @@
         if(state === 'fix') {
             drawHeart(width/2 - gap, height/2, 90, '#ff1493', 25, 'left');
             drawHeart(width/2 + gap, height/2, 90, '#ff1493', 25, 'right');
+            drawFancyCrack(width/2, height/2, 90, 0, gap);
             fixers.forEach(f => {
                 f.x += f.vx; f.y += f.vy;
                 if(f.x < 40 || f.x > width-40) f.vx *= -1;
@@ -277,8 +275,8 @@
 
         if(state === 'pre_defend') {
             drawHeart(width/2, height/2, 95, '#ff1493', 30);
-            const ht = document.getElementById('hint-text');
-            ht.innerText = "Воно ще слабке! Захисти його! 🛡️"; ht.style.opacity = '1';
+            document.getElementById('hint-text').innerText = "Воно ще слабке! Захисти його! 🛡️";
+            document.getElementById('hint-text').style.opacity = '1';
             if(timer > 150) { state = 'defend'; timer = 0; enemiesSpawned = 0; enemies = []; }
         }
 
@@ -302,12 +300,11 @@
         }
 
         if(state === 'pulse') {
-            let s = 110 + Math.sin(timer*0.08)*22;
-            drawHeart(width/2, height/2, s, '#ff1493', 45);
+            drawHeart(width/2, height/2, 110 + Math.sin(timer*0.08)*22, '#ff1493', 45);
             if(timer > 150) {
                 state = 'clicker';
-                const ht = document.getElementById('hint-text');
-                ht.innerText = "Тепер воно твоє! Відкрий його! 🔨"; ht.style.opacity = '1';
+                document.getElementById('hint-text').innerText = "Тепер воно твоє! Відкрий його! 🔨";
+                document.getElementById('hint-text').style.opacity = '1';
             }
         }
 
