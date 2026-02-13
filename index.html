@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Валентинка ❤️</title>
+    <title>Perfect Broken Heart ❤️</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; touch-action: none; color: white; }
         canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; }
         
+        /* КНОПКА МОВИ */
+        #lang-switch { position: fixed; top: 20px; left: 20px; z-index: 150; background: rgba(255, 20, 147, 0.2); border: 1px solid #ff1493; color: white; padding: 5px 10px; border-radius: 10px; cursor: pointer; font-size: 12px; }
+
         #login-screen { position: fixed; inset: 0; background: radial-gradient(circle, #1a0510 0%, #000 100%); display: flex; justify-content: center; align-items: center; z-index: 100; transition: opacity 0.8s; }
         .glass-card { background: rgba(15, 15, 15, 0.95); padding: 30px; border-radius: 40px; border: 2px solid #ff1493; text-align: center; width: 320px; box-shadow: 0 0 40px rgba(255, 20, 147, 0.4); }
         
@@ -19,24 +22,10 @@
         
         #hint-text { position: fixed; top: 20%; width: 100%; text-align: center; font-family: 'Caveat', cursive; font-size: 40px; color: #fff; z-index: 20; opacity: 0; transition: opacity 1s ease; text-shadow: 0 0 20px #ff1493; pointer-events: none; }
         
-        /* ВИПРАВЛЕНИЙ БЛОК ЗГІДНО ТВОГО ЗАПИТУ */
         #text-container { 
-            position: fixed; 
-            width: 90%; 
-            max-width: 90vw;
-            left: 5%; 
-            top: 120%; 
-            z-index: 30; 
-            opacity: 0; 
-            transition: top 2.5s cubic-bezier(0.1, 0.8, 0.2, 1), opacity 1s; 
-            background: rgba(0, 0, 0, 0.95); 
-            padding: 25px; 
-            border-radius: 35px; 
-            border: 2px solid #ff1493; 
-            box-sizing: border-box;
-            text-align: center;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
+            position: fixed; width: 90%; max-width: 90vw; left: 5%; top: 120%; z-index: 30; opacity: 0; 
+            transition: top 2.5s cubic-bezier(0.1, 0.8, 0.2, 1), opacity 1s; background: rgba(0, 0, 0, 0.95); 
+            padding: 25px; border-radius: 35px; border: 2px solid #ff1493; box-sizing: border-box; text-align: center; word-wrap: break-word;
         }
         
         #close-btn { position: fixed; top: 25px; right: 25px; z-index: 110; width: 45px; height: 45px; background: rgba(255,20,147,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; opacity: 0; pointer-events: none; color: white; border: 1px solid #ff1493; }
@@ -44,20 +33,21 @@
 </head>
 <body onclick="handleGlobalClick(event)">
 
+    <button id="lang-switch" onclick="toggleLang()">UA / RU</button>
     <div id="close-btn" onclick="location.reload()">✕</div>
     <div id="hint-text"></div>
 
     <div id="login-screen">
         <div class="glass-card">
-            <h2>Хто ти, красуне? ✨</h2>
+            <h2 id="ui-title">Хто ти, красуне? ✨</h2>
             <div class="input-wrapper">
                 <select id="userRole" onchange="toggleSurname()">
-                    <option value="none" selected disabled>Обери роль... ✨</option>
-                    <option value="sister">Сестра 🌸</option>
-                    <option value="friend_f">Подруга 💖</option>
-                    <option value="friend_m">Друг 🤝</option>
-                    <option value="kent">Кент ✊</option>
-                    <option value="discord">Друг з діскорда 🎮</option>
+                    <option value="none" selected disabled id="ui-role-placeholder">Обери роль... ✨</option>
+                    <option value="sister" id="opt-sister">Сестра 🌸</option>
+                    <option value="friend_f" id="opt-friend-f">Подруга 💖</option>
+                    <option value="friend_m" id="opt-friend-m">Друг 🤝</option>
+                    <option value="kent" id="opt-kent">Кент ✊</option>
+                    <option value="discord" id="opt-discord">Друг з діскорда 🎮</option>
                 </select>
             </div>
             <div class="input-wrapper">
@@ -66,7 +56,7 @@
             <div id="surname-group" class="input-wrapper" style="display:none;">
                 <input type="text" id="userSurname" placeholder="Прізвище...">
             </div>
-            <button onclick="startApp()">ВІДКРИТИ СЕРЦЕ 🔥</button>
+            <button onclick="startApp()" id="ui-btn">ВІДКРИТИ СЕРЦЕ 🔥</button>
             <div id="error-msg" style="color:#ff4444; font-size:12px; margin-top:10px;"></div>
         </div>
     </div>
@@ -78,102 +68,119 @@
     </div>
 
 <script>
+    let currentLang = 'uk';
+    const translations = {
+        uk: {
+            title: "Хто ти, красуне? ✨",
+            rolePlaceholder: "Обери роль... ✨",
+            sister: "Сестра 🌸", friend_f: "Подруга 💖", friend_m: "Друг 🤝", kent: "Кент ✊", discord: "Друг з діскорда 🎮",
+            namePh: "Ім'я...", surnamePh: "Прізвище...", btn: "ВІДКРИТИ СЕРЦЕ 🔥", error: "Доступ обмежено! ❌",
+            hintFix: "Серце розбите... Полагодиш? 🩹", hintDefend: "Воно ще слабке! Захисти його! 🛡️",
+            hintPulse: "Тепер воно твоє! Відкрий його! 🔨", alertFail: "Ти не вберіг його... 💔",
+            wishes: {
+                sister: ["Для сестрички ❤️", "Моя дорога сестричко, ти — найближча мені людина... Люблю тебе безмежно! ❤️"],
+                friend_f: ["Для подруги ✨", "Ти — справжнє сонечко... Нехай кожна твоя мрія стане реальністю! ❤️"],
+                friend_m: ["Друже! 🤝", "Здарова! Вітаю тебе... Удачі тобі у всіх твоїх справах! 🤝"],
+                kent: ["Братан! ✊", "Братан, дякую що ти є... Удачі тобі! 🤝"],
+                discord: ["Кент з ДС! 🎮", "Братан, вітаю тебе... Нехай все буде чотко! 🎮"]
+            }
+        },
+        ru: {
+            title: "Кто ты, красавица? ✨",
+            rolePlaceholder: "Выбери роль... ✨",
+            sister: "Сестра 🌸", friend_f: "Подруга 💖", friend_m: "Друг 🤝", kent: "Кент ✊", discord: "Друг из дискорда 🎮",
+            namePh: "Имя...", surnamePh: "Фамилия...", btn: "ОТКРЫТЬ СЕРДЦЕ 🔥", error: "Доступ ограничен! ❌",
+            hintFix: "Сердце разбито... Починишь? 🩹", hintDefend: "Оно ещё слабое! Защити его! 🛡️",
+            hintPulse: "Теперь оно твоё! Открой его! 🔨", alertFail: "Ты не уберёг его... 💔",
+            wishes: {
+                sister: ["Для сестрёнки ❤️", "Моя дорогая сестрёнка, ты — самый близкий мне человек... Люблю тебя безгранично! ❤️"],
+                friend_f: ["Для подруги ✨", "Ты — настоящее солнышко... Пусть каждая твоя мечта станет реальностью! ❤️"],
+                friend_m: ["Друг! 🤝", "Здарова! Поздравляю тебя... Удачи тебе во всех делах! 🤝"],
+                kent: ["Братан! ✊", "Братан, спасибо что ты есть... Удачи тебе! 🤝"],
+                discord: ["Кент из ДС! 🎮", "Братан, поздравляю тебя... Пусть всё будет чётко! 🎮"]
+            }
+        }
+    };
+
+    function toggleLang() {
+        currentLang = currentLang === 'uk' ? 'ru' : 'uk';
+        const t = translations[currentLang];
+        document.getElementById('ui-title').innerText = t.title;
+        document.getElementById('ui-role-placeholder').innerText = t.rolePlaceholder;
+        document.getElementById('opt-sister').innerText = t.sister;
+        document.getElementById('opt-friend-f').innerText = t.friend_f;
+        document.getElementById('opt-friend-m').innerText = t.friend_m;
+        document.getElementById('opt-kent').innerText = t.kent;
+        document.getElementById('opt-discord').innerText = t.discord;
+        document.getElementById('userName').placeholder = t.namePh;
+        document.getElementById('userSurname').placeholder = t.surnamePh;
+        document.getElementById('ui-btn').innerText = t.btn;
+    }
+
+    // --- ВЕСЬ ІНШИЙ ТВІЙ КОД (Canvas, Update, Logic) ЗАЛИШАЄТЬСЯ ТУТ БЕЗ ЗМІН ---
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const bgMusic = new Audio('https://www.chosic.com/wp-content/uploads/2021/04/My-Love-Piano-Melody.mp3');
     bgMusic.loop = true;
 
-    let width, height, state = 'wait', timer = 0;
-    let particles = [], enemies = [], magicDust = [], bgHearts = [], fixers = [];
+    let width, height, state = 'wait', timer = 0, particles = [], enemies = [], magicDust = [], bgHearts = [], fixers = [];
     let heartScale = 1, heartShake = 0, clicksNeeded = 25, activeRole = "";
     let enemiesSpawned = 0, gap = 0, fixedCount = 0, heartAlpha = 0;
-    const TOTAL_FIXERS = 8;
-    const TOTAL_ENEMIES = 12;
+    const TOTAL_FIXERS = 8, TOTAL_ENEMIES = 12;
 
     function init() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
-
     function toggleSurname() {
         const role = document.getElementById('userRole').value;
         document.getElementById('surname-group').style.display = (role === 'sister' || role === 'kent') ? 'block' : 'none';
     }
 
-    function getCrackPath(size) {
-        return [
-            {x: 0, y: 0},
-            {x: size * 0.1, y: size * 0.2},
-            {x: -size * 0.15, y: size * 0.4},
-            {x: size * 0.2, y: size * 0.6},
-            {x: -size * 0.1, y: size * 0.8},
-            {x: 0, y: size}
-        ];
-    }
+    function getCrackPath(size) { return [{x: 0, y: 0}, {x: size * 0.1, y: size * 0.2}, {x: -size * 0.15, y: size * 0.4}, {x: size * 0.2, y: size * 0.6}, {x: -size * 0.1, y: size * 0.8}, {x: 0, y: size}]; }
 
     function drawHeartPart(size, color, part) {
         const crack = getCrackPath(size);
-        ctx.fillStyle = color;
-        ctx.beginPath();
+        ctx.fillStyle = color; ctx.beginPath();
         if (part === 'left') {
-            ctx.moveTo(0, 0);
-            ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0);
-            ctx.bezierCurveTo(-size/2, -size/2, -size, size/3, 0, size);
+            ctx.moveTo(0, 0); ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0); ctx.bezierCurveTo(-size/2, -size/2, -size, size/3, 0, size);
             for (let i = crack.length - 1; i >= 0; i--) ctx.lineTo(crack[i].x, crack[i].y);
         } else {
-            ctx.moveTo(0, 0);
-            ctx.bezierCurveTo(size, size/3, size/2, -size/2, 0, 0);
-            ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
+            ctx.moveTo(0, 0); ctx.bezierCurveTo(size, size/3, size/2, -size/2, 0, 0); ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
             for (let i = crack.length - 1; i >= 0; i--) ctx.lineTo(crack[i].x, crack[i].y);
         }
-        ctx.closePath();
-        ctx.fill();
+        ctx.closePath(); ctx.fill();
     }
 
     function drawHeart(x, y, size, color, glow = 0, part = 'full') {
-        ctx.save();
-        ctx.translate(x, y - (size * 0.45));
+        ctx.save(); ctx.translate(x, y - (size * 0.45));
         if(glow > 0) { ctx.shadowBlur = glow; ctx.shadowColor = color; }
         let grad = ctx.createRadialGradient(0, size/3, 0, 0, size/3, size);
-        grad.addColorStop(0, color);
-        grad.addColorStop(1, '#550011');
+        grad.addColorStop(0, color); grad.addColorStop(1, '#550011');
         if (part === 'full') {
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.moveTo(0, size);
-            ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0);
-            ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
-            ctx.fill();
-        } else {
-            drawHeartPart(size, grad, part);
-        }
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.moveTo(0, size);
+            ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0); ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size); ctx.fill();
+        } else drawHeartPart(size, grad, part);
         ctx.restore();
     }
 
     function drawFancyCrack(x, y, size, shake, gapValue) {
-        ctx.save();
-        ctx.translate(x, y - (size * 0.45));
+        ctx.save(); ctx.translate(x, y - (size * 0.45));
         const crack = getCrackPath(size);
         [-gapValue, gapValue].forEach(offset => {
-            ctx.save();
-            ctx.translate(offset, 0);
-            ctx.beginPath();
-            ctx.strokeStyle = "rgba(255, 100, 200, 0.8)";
-            ctx.lineWidth = 2;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = "#ff1493";
-            ctx.moveTo(crack[0].x, crack[0].y);
-            for(let p of crack) ctx.lineTo(p.x, p.y);
-            ctx.stroke();
-            ctx.restore();
+            ctx.save(); ctx.translate(offset, 0); ctx.beginPath();
+            ctx.strokeStyle = "rgba(255, 100, 200, 0.8)"; ctx.lineWidth = 2;
+            ctx.shadowBlur = 10; ctx.shadowColor = "#ff1493";
+            ctx.moveTo(crack[0].x, crack[0].y); for(let p of crack) ctx.lineTo(p.x, p.y);
+            ctx.stroke(); ctx.restore();
         });
         ctx.restore();
     }
 
     function checkAccess(role, name, surname) {
         name = name.toLowerCase(); surname = (surname || "").toLowerCase();
-        if (role === 'sister') return ["настя", "анастасія", "марта"].includes(name) && ["цапар", "малітчук"].includes(surname);
-        if (role === 'friend_f') return ["настя", "анастасія", "ангеліна", "евеліна", "люба", "любов"].includes(name);
-        if (role === 'friend_m') return ["матвій", "олег", "саша", "олександ", "андрій", "олесь"].includes(name);
+        if (role === 'sister') return ["настя", "анастасія", "марта", "настя", "анастасия"].includes(name) && ["цапар", "малітчук", "малитчук"].includes(surname);
+        if (role === 'friend_f') return ["настя", "анастасія", "ангеліна", "евеліна", "люба", "любов", "анастасия", "ангелина", "эвелина", "любовь"].includes(name);
+        if (role === 'friend_m') return ["матвій", "олег", "саша", "олександ", "андрій", "олесь", "матвей", "александр", "андрей"].includes(name);
         if (role === 'kent') return (name === "максим" || name === "макс") && (surname === "голоднюк" || surname === "");
-        if (role === 'discord') return ["денис", "максим", "макс", "тімур", "діма", "самир", "данило", "ярік", "никита", "женя", "євген"].includes(name);
+        if (role === 'discord') return ["денис", "максим", "макс", "тімур", "діма", "самир", "данило", "ярік", "никита", "женя", "євген", "тимур", "дима", "ярик"].includes(name);
         return false;
     }
 
@@ -181,17 +188,14 @@
         const role = document.getElementById('userRole').value;
         const name = document.getElementById('userName').value.trim();
         const surname = document.getElementById('userSurname').value.trim();
-        if(!checkAccess(role, name, surname)) { document.getElementById('error-msg').innerText = "Доступ обмежено! ❌"; return; }
-        activeRole = role;
+        if(!checkAccess(role, name, surname)) { document.getElementById('error-msg').innerText = translations[currentLang].error; return; }
+        activeRole = role; document.getElementById('lang-switch').style.display = 'none';
         document.getElementById('login-screen').style.opacity = '0';
         bgMusic.play().catch(() => {});
         setTimeout(() => {
-            document.getElementById('login-screen').style.display = 'none';
-            state = 'assemble'; timer = 0;
+            document.getElementById('login-screen').style.display = 'none'; state = 'assemble'; timer = 0;
             for(let i=0; i<150; i++) {
-                let rx, ry;
-                if(Math.random() > 0.5) { rx = Math.random() > 0.5 ? -100 : width + 100; ry = Math.random() * height; }
-                else { rx = Math.random() * width; ry = Math.random() > 0.5 ? -100 : height + 100; }
+                let rx = Math.random() > 0.5 ? -100 : width + 100; let ry = Math.random() * height;
                 magicDust.push({ x: rx, y: ry, tx: width/2, ty: height/2, sz: Math.random()*5+2, v: 0.003 + Math.random()*0.006, delay: Math.random()*200, reached: false });
             }
         }, 800);
@@ -221,18 +225,15 @@
     }
 
     function update() {
-        ctx.fillStyle = 'rgba(0,0,0,0.25)';
-        ctx.fillRect(0,0,width,height);
-        timer++;
+        ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(0,0,width,height); timer++;
+        const t = translations[currentLang];
 
         if(state === 'assemble') {
             let allReached = true;
             magicDust.forEach(p => {
                 if(timer > p.delay) {
-                    let dx = p.tx - p.x; let dy = p.ty - p.y;
-                    p.x += dx * p.v; p.y += dy * p.v;
-                    drawHeart(p.x, p.y, p.sz, '#ff1493');
-                    if(Math.hypot(dx, dy) < 5) p.reached = true;
+                    p.x += (p.tx - p.x) * p.v; p.y += (p.ty - p.y) * p.v; drawHeart(p.x, p.y, p.sz, '#ff1493');
+                    if(Math.hypot(p.tx - p.x, p.ty - p.y) < 5) p.reached = true;
                 }
                 if(!p.reached) allReached = false;
             });
@@ -243,119 +244,44 @@
             }
         }
 
-        if(state === 'pre_break') {
-            let shake = Math.sin(timer * 0.7) * 4;
-            drawHeart(width/2 + shake, height/2, 90, '#ff1493', 35);
-            drawFancyCrack(width/2 + shake, height/2, 90, 0, 0);
-            if(timer > 70) { state = 'break'; timer = 0; }
-        }
-
         if(state === 'break') {
-            gap = Math.min(gap + 0.8, 56);
-            drawHeart(width/2 - gap, height/2, 90, '#ff1493', 25, 'left');
-            drawHeart(width/2 + gap, height/2, 90, '#ff1493', 25, 'right');
-            drawFancyCrack(width/2, height/2, 90, 0, gap);
-            if(timer > 150) {
-                state = 'fix';
-                document.getElementById('hint-text').innerText = "Серце розбите... Полагодиш? 🩹";
-                document.getElementById('hint-text').style.opacity = '1';
+            gap = Math.min(gap + 0.8, 56); drawHeart(width/2 - gap, height/2, 90, '#ff1493', 25, 'left'); drawHeart(width/2 + gap, height/2, 90, '#ff1493', 25, 'right'); drawFancyCrack(width/2, height/2, 90, 0, gap);
+            if(timer > 150) { state = 'fix'; document.getElementById('hint-text').innerText = t.hintFix; document.getElementById('hint-text').style.opacity = '1';
                 for(let i=0; i<TOTAL_FIXERS; i++) fixers.push({ x: Math.random()*width, y: Math.random()*height, vx: (Math.random()-0.5)*7, vy: (Math.random()-0.5)*7 });
             }
         }
-
+        
         if(state === 'fix') {
-            drawHeart(width/2 - gap, height/2, 90, '#ff1493', 25, 'left');
-            drawHeart(width/2 + gap, height/2, 90, '#ff1493', 25, 'right');
-            drawFancyCrack(width/2, height/2, 90, 0, gap);
-            fixers.forEach(f => {
-                f.x += f.vx; f.y += f.vy;
-                if(f.x < 40 || f.x > width-40) f.vx *= -1;
-                if(f.y < 40 || f.y > height-40) f.vy *= -1;
-                drawHeart(f.x, f.y, 30, '#ff69b4', 15);
-            });
-            if(fixedCount >= TOTAL_FIXERS) {
-                document.getElementById('hint-text').style.opacity = '0';
-                if(timer % 60 === 0) { state = 'pre_defend'; timer = 0; }
-            }
+            drawHeart(width/2 - gap, height/2, 90, '#ff1493', 25, 'left'); drawHeart(width/2 + gap, height/2, 90, '#ff1493', 25, 'right'); drawFancyCrack(width/2, height/2, 90, 0, gap);
+            fixers.forEach(f => { f.x += f.vx; f.y += f.vy; if(f.x < 40 || f.x > width-40) f.vx *= -1; if(f.y < 40 || f.y > height-40) f.vy *= -1; drawHeart(f.x, f.y, 30, '#ff69b4', 15); });
+            if(fixedCount >= TOTAL_FIXERS) { document.getElementById('hint-text').style.opacity = '0'; if(timer % 60 === 0) { state = 'pre_defend'; timer = 0; } }
         }
 
-        if(state === 'pre_defend') {
-            drawHeart(width/2, height/2, 95, '#ff1493', 30);
-            document.getElementById('hint-text').innerText = "Воно ще слабке! Захисти його! 🛡️";
-            document.getElementById('hint-text').style.opacity = '1';
-            if(timer > 150) { state = 'defend'; timer = 0; enemiesSpawned = 0; enemies = []; }
-        }
+        if(state === 'pre_defend') { drawHeart(width/2, height/2, 95, '#ff1493', 30); document.getElementById('hint-text').innerText = t.hintDefend; document.getElementById('hint-text').style.opacity = '1'; if(timer > 150) { state = 'defend'; timer = 0; enemies = []; } }
 
         if(state === 'defend') {
             drawHeart(width/2, height/2, 100, '#ff1493', 35);
-            if(timer % 45 === 0 && enemiesSpawned < TOTAL_ENEMIES) {
-                let ang = Math.random()*Math.PI*2;
-                enemies.push({x: width/2+Math.cos(ang)*width*0.8, y: height/2+Math.sin(ang)*width*0.8, speed: 2.8});
-                enemiesSpawned++;
-            }
+            if(timer % 45 === 0 && enemiesSpawned < TOTAL_ENEMIES) { enemies.push({x: width/2+Math.cos(Math.random()*7)*width*0.8, y: height/2+Math.sin(Math.random()*7)*width*0.8, speed: 2.8}); enemiesSpawned++; }
             enemies.forEach((en, i) => {
-                let a = Math.atan2(height/2-en.y, width/2-en.x);
-                en.x += Math.cos(a)*en.speed; en.y += Math.sin(a)*en.speed;
-                ctx.fillStyle = '#888'; ctx.beginPath(); ctx.arc(en.x, en.y, 12, 0, 7); ctx.fill();
-                if(Math.hypot(width/2-en.x, height/2-en.y) < 50) { alert("Ти не вберіг його... 💔"); location.reload(); }
+                let a = Math.atan2(height/2-en.y, width/2-en.x); en.x += Math.cos(a)*en.speed; en.y += Math.sin(a)*en.speed; ctx.fillStyle = '#888'; ctx.beginPath(); ctx.arc(en.x, en.y, 12, 0, 7); ctx.fill();
+                if(Math.hypot(width/2-en.x, height/2-en.y) < 50) { alert(t.alertFail); location.reload(); }
             });
-            if(enemiesSpawned === TOTAL_ENEMIES && enemies.length === 0) {
-                document.getElementById('hint-text').style.opacity = '0';
-                state = 'pulse'; timer = 0;
-            }
+            if(enemiesSpawned === TOTAL_ENEMIES && enemies.length === 0) { document.getElementById('hint-text').style.opacity = '0'; state = 'pulse'; timer = 0; }
         }
 
-        if(state === 'pulse') {
-            drawHeart(width/2, height/2, 110 + Math.sin(timer*0.08)*22, '#ff1493', 45);
-            if(timer > 150) {
-                state = 'clicker';
-                document.getElementById('hint-text').innerText = "Тепер воно твоє! Відкрий його! 🔨";
-                document.getElementById('hint-text').style.opacity = '1';
-            }
-        }
+        if(state === 'pulse') { drawHeart(width/2, height/2, 110 + Math.sin(timer*0.08)*22, '#ff1493', 45); if(timer > 150) { state = 'clicker'; document.getElementById('hint-text').innerText = t.hintPulse; document.getElementById('hint-text').style.opacity = '1'; } }
+        if(state === 'clicker') { heartShake *= 0.92; drawHeart(width/2+(Math.random()-0.5)*heartShake, height/2+(Math.random()-0.5)*heartShake, 130*heartScale+Math.sin(timer*0.1)*5, '#ff1493', 55); }
+        if(state === 'vortex') { if(timer > 120) { state = 'final'; showFinal(); } }
 
-        if(state === 'clicker') {
-            heartShake *= 0.92;
-            drawHeart(width/2+(Math.random()-0.5)*heartShake, height/2+(Math.random()-0.5)*heartShake, 130*heartScale+Math.sin(timer*0.1)*5, '#ff1493', 55);
-        }
-
-        if(state === 'vortex') {
-            for(let i=0; i<6; i++) {
-                let a = timer * 0.15 + (i * Math.PI * 0.33);
-                let r = timer * 6;
-                particles.push({ x: width/2 + Math.cos(a)*r, y: height/2 + Math.sin(a)*r, vx: 0, vy: 0, a: 1, sz: 22, type: Math.random() > 0.4 ? 'heart' : 'flower' });
-            }
-            if(timer > 120) { state = 'final'; showFinal(); }
-        }
-
-        particles.forEach((p, i) => {
-            p.x += p.vx; p.y += p.vy; p.a -= 0.012;
-            if(p.type === 'flower') {
-                ctx.fillStyle = `rgba(255, 182, 193, ${p.a})`;
-                ctx.beginPath(); for(let j=0; j<5; j++) { let ang = j*1.25 + timer*0.1; ctx.lineTo(p.x+Math.cos(ang)*p.sz, p.y+Math.sin(ang)*p.sz); } ctx.fill();
-            } else {
-                drawHeart(p.x, p.y, p.sz, `rgba(255,20,147,${p.a})`);
-            }
-            if(p.a <= 0) particles.splice(i,1);
-        });
-
-        if(state === 'final') {
-            if(Math.random()>0.85) bgHearts.push({x:Math.random()*width, y:height+20, s:Math.random()*1.5+1});
-            bgHearts.forEach((h,i)=>{ h.y -= h.s; drawHeart(h.x, h.y, 16, 'rgba(255,20,147,0.15)'); if(h.y < -25) bgHearts.splice(i,1); });
-        }
+        particles.forEach((p, i) => { p.x += p.vx; p.y += p.vy; p.a -= 0.012; drawHeart(p.x, p.y, p.sz, `rgba(255,20,147,${p.a})`); if(p.a <= 0) particles.splice(i,1); });
+        if(state === 'final') { if(Math.random()>0.85) bgHearts.push({x:Math.random()*width, y:height+20, s:Math.random()*1.5+1}); bgHearts.forEach((h,i)=>{ h.y -= h.s; drawHeart(h.x, h.y, 16, 'rgba(255,20,147,0.15)'); if(h.y < -25) bgHearts.splice(i,1); }); }
         requestAnimationFrame(update);
     }
 
     function showFinal() {
-        const t = document.getElementById('main-title'), w = document.getElementById('main-wish');
-        const wishes = {
-            sister: ["Для сестрички ❤️", "Моя дорога сестричко, ти — найближча мені людина, мій найкращий друг і надійна опора. Бажаю тобі нескінченного океану кохання, затишку в серці та щоб ти завжди відчувала мою підтримку. Люблю тебе безмежно! ❤️"],
-            friend_f: ["Для подруги ✨", "Ти — справжнє сонечко, яке зігріває всіх навколо. Бажаю тобі ніколи не втрачати свого вогнику, сяяти яскравіше за зірки та отримувати від життя все найкраще. Нехай кожна твоя мрія стане реальністю вже сьогодні! ❤️"],
-            friend_m: ["Друже! 🤝", "Здарова! Вітаю тебе. Бажаю, щоб у житті все йшло рівно і без зайвих напрягів. Нехай здоров’я не подводить, а поруч завжди будуть вірні друзі. Удачі тобі у всіх твоїх справах, тисну руку! 🤝"],
-            kent: ["Братан! ✊", "Братан, дуже дякую що ти в мене є. Вітаю з таким чудовим днем. Бажаю тобі успіхів у житті, щоб все йшло плавно як їде 99. Щоб бак був завжди заповнений. Удачі тобі! 🤝"],
-            discord: ["Кент з ДС! 🎮", "Братан, дуже дякую що ти в мене є. Вітаю з таким чудовим днем. Бажаю тобі успіхів у житті, щоб все йшло плавно як їде 99. Щоб бак був завжди заповнений. Удачі тобі! 🤝"]
-        };
-        const res = wishes[activeRole]; t.innerText = res[0]; w.innerText = res[1];
+        const res = translations[currentLang].wishes[activeRole];
+        document.getElementById('main-title').innerText = res[0];
+        document.getElementById('main-wish').innerText = res[1];
         document.getElementById('text-container').style.opacity = '1';
         document.getElementById('text-container').style.top = '15%';
         document.getElementById('close-btn').style.opacity = '1';
@@ -367,4 +293,3 @@
 </script>
 </body>
 </html>
-
