@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Heart Story Fix ❤️</title>
+    <title>Heart Quest Final Fixed ❤️</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; touch-action: none; color: white; }
@@ -67,6 +67,8 @@
     let particles = [], enemies = [], magicDust = [], bgHearts = [], fixers = [];
     let heartScale = 1, heartShake = 0, clicksNeeded = 25, activeRole = "";
     let enemiesSpawned = 0, gap = 0, fixedCount = 0, heartAlpha = 0;
+    const TOTAL_FIXERS = 8;
+    const TOTAL_ENEMIES = 12;
 
     function init() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
 
@@ -89,7 +91,7 @@
         } else if(part === 'right') {
             ctx.moveTo(0, 0);
             ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
-            ctx.lineTo(0, 0);
+            ctx.lineTo(0, size);
         } else {
             ctx.moveTo(0, size);
             ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0);
@@ -101,11 +103,16 @@
 
     function checkAccess(role, name, surname) {
         name = name.toLowerCase(); surname = (surname || "").toLowerCase();
-        if (role === 'sister') return ["настя", "анастасія", "марта"].includes(name) && ["цапар", "малітчук"].includes(surname);
-        if (role === 'friend_f') return ["настя", "анастасія", "ангеліна", "евеліна", "люба", "любов"].includes(name);
-        if (role === 'friend_m') return ["матвій", "олег", "саша", "олександ", "андрій", "олесь"].includes(name);
+        const sisters = ["настя", "анастасія", "марта"];
+        const friendsF = ["настя", "анастасія", "ангеліна", "евеліна", "люба", "любов"];
+        const friendsM = ["матвій", "олег", "саша", "олександ", "андрій", "олесь"];
+        const ds = ["денис", "максим", "макс", "тімур", "діма", "самир", "данило", "ярік", "никита", "женя", "євген"];
+
+        if (role === 'sister') return sisters.includes(name) && ["цапар", "малітчук"].includes(surname);
+        if (role === 'friend_f') return friendsF.includes(name);
+        if (role === 'friend_m') return friendsM.includes(name);
         if (role === 'kent') return (name === "максим" || name === "макс") && surname === "голоднюк";
-        if (role === 'discord') return ["денис", "максим", "макс", "тімур", "діма", "самир", "данило", "ярік", "никита", "женя", "євген"].includes(name);
+        if (role === 'discord') return ds.includes(name);
         return false;
     }
 
@@ -121,13 +128,10 @@
             document.getElementById('login-screen').style.display = 'none';
             state = 'assemble'; timer = 0;
             for(let i=0; i<150; i++) {
-                let side = Math.floor(Math.random()*4);
                 let rx, ry;
-                if(side==0){rx=Math.random()*width; ry=-100;}
-                else if(side==1){rx=Math.random()*width; ry=height+100;}
-                else if(side==2){rx=-100; ry=Math.random()*height;}
-                else {rx=width+100; ry=Math.random()*height;}
-                magicDust.push({ x: rx, y: ry, tx: width/2, ty: height/2, sz: Math.random()*5+2, v: 0.004 + Math.random()*0.008, delay: Math.random()*150 });
+                if(Math.random() > 0.5) { rx = Math.random() > 0.5 ? -100 : width + 100; ry = Math.random() * height; }
+                else { rx = Math.random() * width; ry = Math.random() > 0.5 ? -100 : height + 100; }
+                magicDust.push({ x: rx, y: ry, tx: width/2, ty: height/2, sz: Math.random()*5+2, v: 0.003 + Math.random()*0.006, delay: Math.random()*200, reached: false });
             }
         }, 800);
     }
@@ -136,14 +140,14 @@
         if(state === 'fix') {
             fixers.forEach((f, i) => {
                 if(Math.hypot(e.clientX - f.x, e.clientY - f.y) < 60) {
-                    fixers.splice(i, 1); fixedCount++; gap -= 15;
+                    fixers.splice(i, 1); fixedCount++; gap -= 7;
                     for(let j=0; j<15; j++) particles.push({x: f.x, y: f.y, vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12, a: 1, sz: 4, type:'heart'});
                 }
             });
         }
         if(state === 'defend') {
             enemies.forEach((en, i) => {
-                if(Math.hypot(e.clientX - en.x, en.y - e.clientY) < 70) {
+                if(Math.hypot(e.clientX - en.x, e.clientY - en.y) < 70) {
                     enemies.splice(i, 1);
                     for(let j=0; j<12; j++) particles.push({x: en.x, y: en.y, vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15, a: 1, sz: 3, type:'dust'});
                 }
@@ -161,31 +165,33 @@
         timer++;
 
         if(state === 'assemble') {
-            let reached = 0;
+            let allReached = true;
             magicDust.forEach(p => {
                 if(timer > p.delay) {
-                    p.x += (p.tx - p.x) * p.v; p.y += (p.ty - p.y) * p.v;
+                    let dx = p.tx - p.x; let dy = p.ty - p.y;
+                    p.x += dx * p.v; p.y += dy * p.v;
                     drawHeart(p.x, p.y, p.sz, '#ff1493');
-                    if(Math.hypot(p.x - p.tx, p.y - p.ty) < 10) reached++;
+                    if(Math.hypot(dx, dy) < 5) p.reached = true;
                 }
+                if(!p.reached) allReached = false;
             });
-            // Серце проявляється лише коли більшість частинок вже майже в центрі (після 4 сек)
-            if(reached > magicDust.length * 0.85 || timer > 350) {
-                heartAlpha = Math.min(heartAlpha + 0.015, 1);
+            
+            if(allReached && timer > 400) {
+                heartAlpha = Math.min(heartAlpha + 0.02, 1);
                 drawHeart(width/2, height/2, 85, `rgba(255, 20, 147, ${heartAlpha})`, 25*heartAlpha);
-                if(timer > 500) { state = 'break'; timer = 0; }
+                if(heartAlpha >= 1 && timer > 550) { state = 'break'; timer = 0; }
             }
         }
 
         if(state === 'break') {
-            gap = Math.min(gap + 1.2, 55);
+            gap = Math.min(gap + 1.2, 56);
             drawHeart(width/2 - gap, height/2, 85, '#ff1493', 25, 'left');
             drawHeart(width/2 + gap, height/2, 85, '#ff1493', 25, 'right');
             if(timer > 100) {
                 state = 'fix';
                 const ht = document.getElementById('hint-text');
                 ht.innerText = "Серце розбите... Полагодиш? 🩹"; ht.style.opacity = '1';
-                for(let i=0; i<4; i++) fixers.push({ x: Math.random()*width, y: Math.random()*height, vx: (Math.random()-0.5)*6, vy: (Math.random()-0.5)*6 });
+                for(let i=0; i<TOTAL_FIXERS; i++) fixers.push({ x: Math.random()*width, y: Math.random()*height, vx: (Math.random()-0.5)*7, vy: (Math.random()-0.5)*7 });
             }
         }
 
@@ -196,11 +202,11 @@
                 f.x += f.vx; f.y += f.vy;
                 if(f.x < 40 || f.x > width-40) f.vx *= -1;
                 if(f.y < 40 || f.y > height-40) f.vy *= -1;
-                drawHeart(f.x, f.y, 28, '#ff69b4', 15);
+                drawHeart(f.x, f.y, 30, '#ff69b4', 15);
             });
-            if(fixedCount === 4) {
+            if(fixedCount >= TOTAL_FIXERS) {
                 document.getElementById('hint-text').style.opacity = '0';
-                if(timer % 80 === 0) { state = 'pre_defend'; timer = 0; }
+                if(timer % 60 === 0) { state = 'pre_defend'; timer = 0; }
             }
         }
 
@@ -208,21 +214,21 @@
             drawHeart(width/2, height/2, 90, '#ff1493', 30);
             const ht = document.getElementById('hint-text');
             ht.innerText = "Воно ще слабке! Захисти його! 🛡️"; ht.style.opacity = '1';
-            if(timer > 150) { state = 'defend'; timer = 0; }
+            if(timer > 150) { state = 'defend'; timer = 0; enemiesSpawned = 0; enemies = []; }
         }
 
         if(state === 'defend') {
             drawHeart(width/2, height/2, 95, '#ff1493', 35);
-            if(timer % 55 === 0 && enemiesSpawned < TOTAL_ENEMIES) {
+            if(timer % 45 === 0 && enemiesSpawned < TOTAL_ENEMIES) {
                 let ang = Math.random()*Math.PI*2;
-                enemies.push({x: width/2+Math.cos(ang)*width, y: height/2+Math.sin(ang)*width, speed: 2.5});
+                enemies.push({x: width/2+Math.cos(ang)*width*0.8, y: height/2+Math.sin(ang)*width*0.8, speed: 2.8});
                 enemiesSpawned++;
             }
             enemies.forEach((en, i) => {
                 let a = Math.atan2(height/2-en.y, width/2-en.x);
                 en.x += Math.cos(a)*en.speed; en.y += Math.sin(a)*en.speed;
-                ctx.fillStyle = '#777'; ctx.beginPath(); ctx.arc(en.x, en.y, 11, 0, 7); ctx.fill();
-                if(Math.hypot(width/2-en.x, height/2-en.y) < 50) { alert("Серце не витримало... 💔"); location.reload(); }
+                ctx.fillStyle = '#888'; ctx.beginPath(); ctx.arc(en.x, en.y, 12, 0, 7); ctx.fill();
+                if(Math.hypot(width/2-en.x, height/2-en.y) < 50) { alert("Ти не вберіг його... 💔"); location.reload(); }
             });
             if(enemiesSpawned === TOTAL_ENEMIES && enemies.length === 0) {
                 document.getElementById('hint-text').style.opacity = '0';
@@ -248,8 +254,8 @@
         if(state === 'vortex') {
             for(let i=0; i<6; i++) {
                 let a = timer * 0.15 + (i * Math.PI * 0.33);
-                let r = timer * 4;
-                particles.push({ x: width/2 + Math.cos(a)*r, y: height/2 + Math.sin(a)*r, vx: 0, vy: 0, a: 1, sz: 18, type: Math.random() > 0.4 ? 'heart' : 'flower' });
+                let r = timer * 5;
+                particles.push({ x: width/2 + Math.cos(a)*r, y: height/2 + Math.sin(a)*r, vx: 0, vy: 0, a: 1, sz: 20, type: Math.random() > 0.4 ? 'heart' : 'flower' });
             }
             if(timer > 120) { state = 'final'; showFinal(); }
         }
