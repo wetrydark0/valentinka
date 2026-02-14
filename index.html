@@ -150,7 +150,6 @@
             border: 1px solid #ff1493; 
         }
 
-        /* НОВА КНОПКА ПОДАРУНКА */
         #gift-btn {
             position: fixed;
             bottom: 25px;
@@ -211,11 +210,11 @@
     </div>
 
     <div id="quiz-container">
-        <h2 id="quiz-q-title" style="font-size: 24px; margin-bottom: 15px;">Питання</h2>
+        <h2 id="quiz-q-title" style="font-size: 24px; margin-bottom: 15px;"></h2>
         <div class="input-wrapper">
-            <input type="text" id="quiz-answer" placeholder="Твоя відповідь..." autocomplete="off">
+            <input type="text" id="quiz-answer" placeholder="" autocomplete="off">
         </div>
-        <button onclick="nextQuestion()" class="main-btn">Відповісти</button>
+        <button id="quiz-submit-btn" onclick="nextQuestion()" class="main-btn"></button>
         <p id="quiz-status" style="margin-top: 15px; font-size: 14px; color: #ff69b4; min-height: 1.2em;"></p>
     </div>
 
@@ -229,6 +228,19 @@
             namePh: "Ім'я...", surnamePh: "Прізвище...", btn: "ВІДКРИТИ СЕРЦЕ 🔥", error: "Доступ обмежено! ❌",
             hintFix: "Серце розбите... Полагодиш? 🩹", hintDefend: "Воно ще слабке! Захисти його! 🛡️",
             hintPulse: "Тепер воно твоє! Відкрий його! 🔨", alertFail: "Ти не вберіг його... 💔",
+            giftBtn: "Получити подарок 🎁",
+            quizAnsPh: "Твоя відповідь...",
+            quizSubmit: "Відповісти",
+            quizSuccess: "Відповідь зараховано!",
+            quizFinalTitle: "Ваш код:",
+            quizFinalSub: "Відправ цей код на телеграм власнику сайту.",
+            questions: [
+                "Як звати власника цього сайту?",
+                "Скільки років власнику сайту? (цифрами)",
+                "Який юз власника в телеграмі? (@юз)",
+                "Скільки котів у власника сайту? (цифрами)",
+                "Приблизний ріст власника сайту? (цифрами)"
+            ],
             wishes: {
                 sister: ["Для сестрички ❤️", "Моя дорога сестричко, ти — найближча мені людина, мій найкращий друг і надійна опора. Бажаю тобі нескінченного океану кохання, затишку в серці та щоб ти завжди відчувала мою підтримку. Люблю тебе безмежно! ❤️"],
                 friend_f: ["Для подруги ✨", "Ти — справжнє сонечко, яке зігріває всіх навколо. Бажаю тобі ніколи не втрачати свого вогнику, сяяти яскравіше за зірки та отримувати від життя все найкраще. Нехай кожна твоя мрія стане реальністю вже сьогодні! ❤️"],
@@ -244,6 +256,19 @@
             namePh: "Имя...", surnamePh: "Фамилия...", btn: "ОТКРЫТЬ СЕРДЦЕ 🔥", error: "Доступ ограничен! ❌",
             hintFix: "Сердце разбито... Починишь? 🩹", hintDefend: "Оно ещё слабое! Защити его! 🛡️",
             hintPulse: "Теперь оно твоё! Открой его! 🔨", alertFail: "Ты не уберёг его... 💔",
+            giftBtn: "Получить подарок 🎁",
+            quizAnsPh: "Твой ответ...",
+            quizSubmit: "Ответить",
+            quizSuccess: "Ответ засчитан!",
+            quizFinalTitle: "Ваш код:",
+            quizFinalSub: "Отправь этот код в телеграм владельцу сайта.",
+            questions: [
+                "Как зовут владельца этого сайта?",
+                "Сколько лет владельцу сайта? (цифрами)",
+                "Какой юз владельца в телеграме? (@юз)",
+                "Сколько котов у владельца сайта? (цифрами)",
+                "Приблизительный рост владельца сайта? (цифрами)"
+            ],
             wishes: {
                 sister: ["Для сестрёнки ❤️", "Моя дорогая сестрёнка, ты — самый близкий мне человек, мой лучший друг и надёжная опора. Желаю тебе бесконечного океана любви, уют в сердце и чтобы ты всегда чувствовала мою поддержку. Люблю тебя безгранично! ❤️"],
                 friend_f: ["Для подруги ✨", "Ты — настоящее солнышко, которое согревает всех вокруг. Желаю тебе никогда не терять своего огонька, сиять ярче звёзд и получать от жизни всё самое лучшее. Пусть каждая твоя мечта станет реальностью уже сегодня! ❤️"],
@@ -254,13 +279,12 @@
         }
     };
 
-    // ДАНІ КВІЗУ
-    const questions = [
-        { q: "Як звати власника цього сайту?", a: ["роман", "рома"] },
-        { q: "Скільки років власнику сайту? (цифрами)", a: ["16"] },
-        { q: "Який юз власника в телеграмі? (@юз)", a: ["@roman1939", "roman1939"] },
-        { q: "Скільки котів у власника сайту? (цифрами)", a: ["1"] },
-        { q: "Приблизний ріст власника сайту? (цифрами)", a: ["181", "182", "183"] }
+    const answerKeys = [
+        ["роман", "рома"],
+        ["16"],
+        ["@roman1939", "roman1939"],
+        ["1"],
+        ["181", "182", "183"]
     ];
 
     const codes = {
@@ -286,6 +310,9 @@
         document.getElementById('userName').placeholder = t.namePh;
         document.getElementById('userSurname').placeholder = t.surnamePh;
         document.getElementById('ui-btn').innerText = t.btn;
+        document.getElementById('gift-btn').innerText = t.giftBtn;
+        document.getElementById('quiz-answer').placeholder = t.quizAnsPh;
+        document.getElementById('quiz-submit-btn').innerText = t.quizSubmit;
     }
 
     const canvas = document.getElementById('canvas');
@@ -462,12 +489,15 @@
         }
     }
 
-    // ЛОГІКА КВІЗУ ТА ПОДАРУНКА
     function startQuiz() {
         document.getElementById('text-container').style.opacity = '0';
         document.getElementById('gift-btn').style.opacity = '0';
         document.getElementById('gift-btn').style.pointerEvents = 'none';
         
+        // Оновлюємо тексти перед показом
+        document.getElementById('quiz-answer').placeholder = translations[currentLang].quizAnsPh;
+        document.getElementById('quiz-submit-btn').innerText = translations[currentLang].quizSubmit;
+
         setTimeout(() => {
             document.getElementById('quiz-container').style.opacity = '1';
             document.getElementById('quiz-container').style.top = '25%';
@@ -476,8 +506,8 @@
     }
 
     function showQuestion() {
-        if (currentQuestionIndex < questions.length) {
-            document.getElementById('quiz-q-title').innerText = questions[currentQuestionIndex].q;
+        if (currentQuestionIndex < translations[currentLang].questions.length) {
+            document.getElementById('quiz-q-title').innerText = translations[currentLang].questions[currentQuestionIndex];
             document.getElementById('quiz-answer').value = "";
             document.getElementById('quiz-status').innerText = "";
         } else {
@@ -487,13 +517,13 @@
 
     function nextQuestion() {
         const userAns = document.getElementById('quiz-answer').value.trim().toLowerCase();
-        const correctAnswers = questions[currentQuestionIndex].a;
+        const correctAnswers = answerKeys[currentQuestionIndex];
         
         if (correctAnswers.includes(userAns)) {
             correctAnswersCount++;
         }
 
-        document.getElementById('quiz-status').innerText = "Відповідь зараховано!";
+        document.getElementById('quiz-status').innerText = translations[currentLang].quizSuccess;
         
         setTimeout(() => {
             currentQuestionIndex++;
@@ -507,12 +537,13 @@
         else if (correctAnswersCount === 4) category = "medium";
 
         const randomCode = codes[category][Math.floor(Math.random() * 10)];
+        const t = translations[currentLang];
         
-        document.getElementById('quiz-q-title').innerText = "Твій результат!";
+        document.getElementById('quiz-q-title').innerText = t.quizFinalTitle;
         document.getElementById('quiz-container').innerHTML = `
-            <h2 style="color: #ff1493; font-family: 'Caveat', cursive;">Ваш код:</h2>
+            <h2 style="color: #ff1493; font-family: 'Caveat', cursive;">${t.quizFinalTitle}</h2>
             <div style="border: 2px dashed #ff1493; padding: 15px; font-size: 24px; margin: 15px 0; letter-spacing: 2px;">${randomCode}</div>
-            <p style="font-size: 14px;">Відправ цей код на телеграм власнику сайту.</p>
+            <p style="font-size: 14px;">${t.quizFinalSub}</p>
         `;
         
         document.getElementById('close-btn').style.opacity = '1';
@@ -654,7 +685,6 @@
         document.getElementById('text-container').style.opacity = '1';
         document.getElementById('text-container').style.top = '15%';
         
-        // ПОКАЗУЄМО КНОПКИ
         document.getElementById('close-btn').style.opacity = '1';
         document.getElementById('close-btn').style.pointerEvents = 'auto';
         document.getElementById('gift-btn').style.opacity = '1';
