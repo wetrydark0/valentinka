@@ -38,7 +38,7 @@
             cursor: pointer; 
             font-size: 12px; 
             font-weight: bold; 
-            width: auto; /* Тільки по ширині тексту */
+            width: auto; 
             transition: 0.3s;
         }
 
@@ -112,11 +112,12 @@
             pointer-events: none; 
         }
         
-        #text-container { 
+        #text-container, #quiz-container { 
             position: fixed; 
             width: 90%; 
-            max-width: 90vw; 
-            left: 5%; 
+            max-width: 400px; 
+            left: 50%; 
+            transform: translateX(-50%);
             top: 120%; 
             z-index: 30; 
             opacity: 0; 
@@ -148,12 +149,34 @@
             color: white; 
             border: 1px solid #ff1493; 
         }
+
+        /* НОВА КНОПКА ПОДАРУНКА */
+        #gift-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 110;
+            background: linear-gradient(45deg, #ff1493, #4b0082);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            border: 1px solid #ff1493;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.5s;
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.5);
+        }
     </style>
 </head>
 <body onclick="handleGlobalClick(event)">
 
     <button id="lang-switch" onclick="toggleLang(event)">UA / RU</button>
     <div id="close-btn" onclick="location.reload()">✕</div>
+    <button id="gift-btn" onclick="startQuiz()">Получити подарок 🎁</button>
+    
     <div id="hint-text"></div>
 
     <div id="login-screen">
@@ -181,9 +204,19 @@
     </div>
 
     <canvas id="canvas"></canvas>
+
     <div id="text-container">
         <h1 id="main-title" style="font-family: 'Caveat', cursive; font-size: 32px; color: #ff1493; margin-bottom: 12px;"></h1>
         <p id="main-wish" style="font-size: 17px; line-height: 1.5; margin: 0;"></p>
+    </div>
+
+    <div id="quiz-container">
+        <h2 id="quiz-q-title" style="font-size: 24px; margin-bottom: 15px;">Питання</h2>
+        <div class="input-wrapper">
+            <input type="text" id="quiz-answer" placeholder="Твоя відповідь..." autocomplete="off">
+        </div>
+        <button onclick="nextQuestion()" class="main-btn">Відповісти</button>
+        <p id="quiz-status" style="margin-top: 15px; font-size: 14px; color: #ff69b4; min-height: 1.2em;"></p>
     </div>
 
 <script>
@@ -212,7 +245,7 @@
             hintFix: "Сердце разбито... Починишь? 🩹", hintDefend: "Оно ещё слабое! Защити его! 🛡️",
             hintPulse: "Теперь оно твоё! Открой его! 🔨", alertFail: "Ты не уберёг его... 💔",
             wishes: {
-                sister: ["Для сестрёнки ❤️", "Моя дорогая сестрёнка, ты — самый близкий мне человек, мой лучший друг и надёжная опора. Желаю тебе бесконечного океана любви, уюта в сердце и чтобы ты всегда чувствовала мою поддержку. Люблю тебя безгранично! ❤️"],
+                sister: ["Для сестрёнки ❤️", "Моя дорогая сестрёнка, ты — самый близкий мне человек, мой лучший друг и надёжная опора. Желаю тебе бесконечного океана любви, уют в сердце и чтобы ты всегда чувствовала мою поддержку. Люблю тебя безгранично! ❤️"],
                 friend_f: ["Для подруги ✨", "Ты — настоящее солнышко, которое согревает всех вокруг. Желаю тебе никогда не терять своего огонька, сиять ярче звёзд и получать от жизни всё самое лучшее. Пусть каждая твоя мечта станет реальностью уже сегодня! ❤️"],
                 friend_m: ["Друг! 🤝", "Здарова! Поздравляю тебя. Желаю, чтобы в жизни всё шло ровно и без лишних напрягов. Пусть здоровье не подводит, а рядом всегда будут верные друзья. Удачи тебе во всех твоих делах, жму руку! 🤝"],
                 kent: ["Братан! ✊", "Братан, спасибо огромное что ты у меня есть. Поздравляю с таким чудесным днём. Желаю тебе успехов в жизни, чтобы всё шло плавно как едет 99. Чтобы бак был всегда полон. Удачи тебе! 🤝"],
@@ -220,6 +253,24 @@
             }
         }
     };
+
+    // ДАНІ КВІЗУ
+    const questions = [
+        { q: "Як звати власника цього сайту?", a: ["роман", "рома"] },
+        { q: "Скільки років власнику сайту? (цифрами)", a: ["16"] },
+        { q: "Який юз власника в телеграмі? (@юз)", a: ["@roman1939", "roman1939"] },
+        { q: "Скільки котів у власника сайту? (цифрами)", a: ["1"] },
+        { q: "Приблизний ріст власника сайту? (цифрами)", a: ["181", "182", "183"] }
+    ];
+
+    const codes = {
+        correct: ["ye29ja20", "ye29ja21", "ye29ja22", "ye29ja23", "ye29ja24", "ye29ja25", "ye29ja26", "ye29ja27", "ye29ja28", "ye29ja29"],
+        medium: ["kat88ur20", "kat88ur21", "kat88ur22", "kat88ur23", "kat88ur24", "kat88ur25", "kat88ur26", "kat88ur27", "kat88ur28", "kat88ur29"],
+        wrong: ["bi37hu20", "bi37hu21", "bi37hu22", "bi37hu23", "bi37hu24", "bi37hu25", "bi37hu26", "bi37hu27", "bi37hu28", "bi37hu29"]
+    };
+
+    let currentQuestionIndex = 0;
+    let correctAnswersCount = 0;
 
     function toggleLang(e) {
         if(e) e.stopPropagation();
@@ -411,6 +462,63 @@
         }
     }
 
+    // ЛОГІКА КВІЗУ ТА ПОДАРУНКА
+    function startQuiz() {
+        document.getElementById('text-container').style.opacity = '0';
+        document.getElementById('gift-btn').style.opacity = '0';
+        document.getElementById('gift-btn').style.pointerEvents = 'none';
+        
+        setTimeout(() => {
+            document.getElementById('quiz-container').style.opacity = '1';
+            document.getElementById('quiz-container').style.top = '25%';
+            showQuestion();
+        }, 1000);
+    }
+
+    function showQuestion() {
+        if (currentQuestionIndex < questions.length) {
+            document.getElementById('quiz-q-title').innerText = questions[currentQuestionIndex].q;
+            document.getElementById('quiz-answer').value = "";
+            document.getElementById('quiz-status').innerText = "";
+        } else {
+            finishQuiz();
+        }
+    }
+
+    function nextQuestion() {
+        const userAns = document.getElementById('quiz-answer').value.trim().toLowerCase();
+        const correctAnswers = questions[currentQuestionIndex].a;
+        
+        if (correctAnswers.includes(userAns)) {
+            correctAnswersCount++;
+        }
+
+        document.getElementById('quiz-status').innerText = "Відповідь зараховано!";
+        
+        setTimeout(() => {
+            currentQuestionIndex++;
+            showQuestion();
+        }, 3000);
+    }
+
+    function finishQuiz() {
+        let category = "wrong";
+        if (correctAnswersCount === 5) category = "correct";
+        else if (correctAnswersCount === 4) category = "medium";
+
+        const randomCode = codes[category][Math.floor(Math.random() * 10)];
+        
+        document.getElementById('quiz-q-title').innerText = "Твій результат!";
+        document.getElementById('quiz-container').innerHTML = `
+            <h2 style="color: #ff1493; font-family: 'Caveat', cursive;">Ваш код:</h2>
+            <div style="border: 2px dashed #ff1493; padding: 15px; font-size: 24px; margin: 15px 0; letter-spacing: 2px;">${randomCode}</div>
+            <p style="font-size: 14px;">Відправ цей код на телеграм власнику сайту.</p>
+        `;
+        
+        document.getElementById('close-btn').style.opacity = '1';
+        document.getElementById('close-btn').style.pointerEvents = 'auto';
+    }
+
     function update() {
         ctx.fillStyle = 'rgba(0,0,0,0.25)';
         ctx.fillRect(0,0,width,height);
@@ -545,8 +653,12 @@
         document.getElementById('main-wish').innerText = res[1];
         document.getElementById('text-container').style.opacity = '1';
         document.getElementById('text-container').style.top = '15%';
+        
+        // ПОКАЗУЄМО КНОПКИ
         document.getElementById('close-btn').style.opacity = '1';
         document.getElementById('close-btn').style.pointerEvents = 'auto';
+        document.getElementById('gift-btn').style.opacity = '1';
+        document.getElementById('gift-btn').style.pointerEvents = 'auto';
     }
 
     init(); 
