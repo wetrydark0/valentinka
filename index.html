@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Валентинка ❤️</title>
+    <title>Perfect Broken Heart ❤️</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap');
         
@@ -24,7 +24,6 @@
             z-index: 1; 
         }
         
-        /* МАЛЕНЬКА КНОПКА МОВИ В КУТКУ */
         #lang-switch { 
             position: fixed; 
             top: 15px; 
@@ -53,7 +52,6 @@
             transition: opacity 0.8s; 
         }
 
-        /* ОБМЕЖЕННЯ ДЛЯ КАРТКИ ЛОГІНУ */
         .glass-card { 
             background: rgba(15, 15, 15, 0.95); 
             padding: 30px; 
@@ -118,13 +116,12 @@
             pointer-events: none; 
         }
         
-        /* ОБМЕЖЕННЯ ДЛЯ ТЕКСТОВИХ КОНТЕЙНЕРІВ */
         #text-container, #quiz-container { 
             position: fixed; 
             width: 90%; 
             max-width: 400px; 
-            max-height: 80vh; /* Щоб не вилазило за екран по висоті */
-            overflow-y: auto; /* Прокрутка, якщо текст великий */
+            max-height: 80vh; 
+            overflow-y: auto; 
             left: 50%; 
             transform: translateX(-50%);
             top: 120%; 
@@ -137,7 +134,7 @@
             border: 2px solid #ff1493; 
             box-sizing: border-box; 
             text-align: center; 
-            overflow-wrap: break-word; /* Перенос довгих слів */
+            overflow-wrap: break-word; 
         }
         
         #close-btn { 
@@ -241,6 +238,7 @@
             quizAnsPh: "Твоя відповідь...",
             quizSubmit: "Відповісти",
             quizSuccess: "Відповідь зараховано!",
+            quizEmpty: "Будь ласка, введіть відповідь! ⚠️",
             quizFinalTitle: "Ваш код:",
             quizFinalSub: "Відправ цей код на телеграм власнику сайту.",
             questions: [
@@ -269,6 +267,7 @@
             quizAnsPh: "Твой ответ...",
             quizSubmit: "Ответить",
             quizSuccess: "Ответ засчитан!",
+            quizEmpty: "Пожалуйста, введите ответ! ⚠️",
             quizFinalTitle: "Ваш код:",
             quizFinalSub: "Отправь этот код в телеграм владельцу сайта.",
             questions: [
@@ -279,7 +278,7 @@
                 "Приблизительный рост владельца сайта? (цифрами)"
             ],
             wishes: {
-                sister: ["Для сестрёнки ❤️", "Моя дорогая сестрёнка, ты — самый близкий мне человек, мой лучший друг и надёжная опора. Желаю тебе бесконечного океана любви, уют в сердце и чтобы ты всегда чувствовала мою поддержку. Люблю тебя безгранично! ❤️"],
+                sister: ["Для сестрёнки ❤️", "Моя дорога сестрёнка, ты — самый близкий мне человек, мой лучший друг и надёжная опора. Желаю тебе бесконечного океана любви, уют в сердце и чтобы ты всегда чувствовала мою поддержку. Люблю тебя безгранично! ❤️"],
                 friend_f: ["Для подруги ✨", "Ты — настоящее солнышко, которое согревает всех вокруг. Желаю тебе никогда не терять своего огонька, сиять ярче звёзд и получать от жизни всё самое лучшее. Пусть каждая твоя мечта станет реальностью уже сегодня! ❤️"],
                 friend_m: ["Друг! 🤝", "Здарова! Поздравляю тебя. Желаю, чтобы в жизни всё шло ровно и без лишних напрягов. Пусть здоровье не подводит, а рядом всегда будут верные друзья. Удачи тебе во всех твоих делах, жму руку! 🤝"],
                 kent: ["Братан! ✊", "Братан, спасибо огромное что ты у меня есть. Поздравляю с таким чудесным днём. Желаю тебе успехов в жизни, чтобы всё шло плавно как едет 99. Чтобы бак был всегда полон. Удачи тебе! 🤝"],
@@ -393,7 +392,6 @@
             ctx.moveTo(0, size);
             ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0);
             ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
-            // Використовуємо .fill() замість окремих блоків щоб не міняти код
             ctx.fill();
         } else {
             drawHeartPart(size, grad, part);
@@ -509,7 +507,7 @@
 
         setTimeout(() => {
             document.getElementById('quiz-container').style.opacity = '1';
-            document.getElementById('quiz-container').style.top = '10%'; // Піднято вище для кращого вигляду на малих екранах
+            document.getElementById('quiz-container').style.top = '10%'; 
             showQuestion();
         }, 1000);
     }
@@ -519,13 +517,27 @@
             document.getElementById('quiz-q-title').innerText = translations[currentLang].questions[currentQuestionIndex];
             document.getElementById('quiz-answer').value = "";
             document.getElementById('quiz-status').innerText = "";
+            document.getElementById('quiz-submit-btn').style.display = "block"; // Повертаємо кнопку для нового питання
         } else {
             finishQuiz();
         }
     }
 
     function nextQuestion() {
-        const userAns = document.getElementById('quiz-answer').value.trim().toLowerCase();
+        const inputField = document.getElementById('quiz-answer');
+        const userAns = inputField.value.trim().toLowerCase();
+        
+        // ПЕРЕВІРКА НА ПУСТЕ ПОЛЕ
+        if (userAns === "") {
+            document.getElementById('quiz-status').innerText = translations[currentLang].quizEmpty;
+            document.getElementById('quiz-status').style.color = "#ff4444";
+            return;
+        }
+
+        // ХОВАЄМО КНОПКУ ПІСЛЯ НАТИСКАННЯ
+        document.getElementById('quiz-submit-btn').style.display = "none";
+        document.getElementById('quiz-status').style.color = "#ff69b4";
+
         const correctAnswers = answerKeys[currentQuestionIndex];
         
         if (correctAnswers.includes(userAns)) {
@@ -692,7 +704,7 @@
         document.getElementById('main-title').innerText = res[0];
         document.getElementById('main-wish').innerText = res[1];
         document.getElementById('text-container').style.opacity = '1';
-        document.getElementById('text-container').style.top = '10%'; // Піднято вище для універсальності
+        document.getElementById('text-container').style.top = '10%'; 
         
         document.getElementById('close-btn').style.opacity = '1';
         document.getElementById('close-btn').style.pointerEvents = 'auto';
@@ -706,4 +718,3 @@
 </script>
 </body>
 </html>
-
