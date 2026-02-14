@@ -53,13 +53,17 @@
             transition: opacity 0.8s; 
         }
 
+        /* ОБМЕЖЕННЯ ДЛЯ КАРТКИ ЛОГІНУ */
         .glass-card { 
             background: rgba(15, 15, 15, 0.95); 
             padding: 30px; 
             border-radius: 40px; 
             border: 2px solid #ff1493; 
             text-align: center; 
-            width: 320px; 
+            width: 90%;
+            max-width: 320px; 
+            max-height: 90vh;
+            overflow-y: auto;
             box-shadow: 0 0 40px rgba(255, 20, 147, 0.4); 
         }
         
@@ -100,7 +104,9 @@
         #hint-text { 
             position: fixed; 
             top: 20%; 
-            width: 100%; 
+            width: 90%; 
+            left: 50%;
+            transform: translateX(-50%);
             text-align: center; 
             font-family: 'Caveat', cursive; 
             font-size: 40px; 
@@ -112,10 +118,13 @@
             pointer-events: none; 
         }
         
+        /* ОБМЕЖЕННЯ ДЛЯ ТЕКСТОВИХ КОНТЕЙНЕРІВ */
         #text-container, #quiz-container { 
             position: fixed; 
             width: 90%; 
             max-width: 400px; 
+            max-height: 80vh; /* Щоб не вилазило за екран по висоті */
+            overflow-y: auto; /* Прокрутка, якщо текст великий */
             left: 50%; 
             transform: translateX(-50%);
             top: 120%; 
@@ -128,7 +137,7 @@
             border: 2px solid #ff1493; 
             box-sizing: border-box; 
             text-align: center; 
-            word-wrap: break-word;
+            overflow-wrap: break-word; /* Перенос довгих слів */
         }
         
         #close-btn { 
@@ -384,6 +393,7 @@
             ctx.moveTo(0, size);
             ctx.bezierCurveTo(-size, size/3, -size/2, -size/2, 0, 0);
             ctx.bezierCurveTo(size/2, -size/2, size, size/3, 0, size);
+            // Використовуємо .fill() замість окремих блоків щоб не міняти код
             ctx.fill();
         } else {
             drawHeartPart(size, grad, part);
@@ -494,13 +504,12 @@
         document.getElementById('gift-btn').style.opacity = '0';
         document.getElementById('gift-btn').style.pointerEvents = 'none';
         
-        // Оновлюємо тексти перед показом
         document.getElementById('quiz-answer').placeholder = translations[currentLang].quizAnsPh;
         document.getElementById('quiz-submit-btn').innerText = translations[currentLang].quizSubmit;
 
         setTimeout(() => {
             document.getElementById('quiz-container').style.opacity = '1';
-            document.getElementById('quiz-container').style.top = '25%';
+            document.getElementById('quiz-container').style.top = '10%'; // Піднято вище для кращого вигляду на малих екранах
             showQuestion();
         }, 1000);
     }
@@ -542,7 +551,7 @@
         document.getElementById('quiz-q-title').innerText = t.quizFinalTitle;
         document.getElementById('quiz-container').innerHTML = `
             <h2 style="color: #ff1493; font-family: 'Caveat', cursive;">${t.quizFinalTitle}</h2>
-            <div style="border: 2px dashed #ff1493; padding: 15px; font-size: 24px; margin: 15px 0; letter-spacing: 2px;">${randomCode}</div>
+            <div style="border: 2px dashed #ff1493; padding: 15px; font-size: 24px; margin: 15px 0; letter-spacing: 2px; word-break: break-all;">${randomCode}</div>
             <p style="font-size: 14px;">${t.quizFinalSub}</p>
         `;
         
@@ -683,7 +692,7 @@
         document.getElementById('main-title').innerText = res[0];
         document.getElementById('main-wish').innerText = res[1];
         document.getElementById('text-container').style.opacity = '1';
-        document.getElementById('text-container').style.top = '15%';
+        document.getElementById('text-container').style.top = '10%'; // Піднято вище для універсальності
         
         document.getElementById('close-btn').style.opacity = '1';
         document.getElementById('close-btn').style.pointerEvents = 'auto';
